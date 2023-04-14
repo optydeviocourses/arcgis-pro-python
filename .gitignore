@@ -1,0 +1,10 @@
+.env
+*.bat
+/Estudos
+/Rasters_Local
+/Rasters_All
+/Run_Tasks
+/Publish_Portal/Modelos
+/Publish_Portal/Rasters
+
+GEOSSP.sde
