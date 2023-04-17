@@ -14,7 +14,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-print("Criando Rasters CVP no Portal  ...")
+print("Criando Rasters CVLI no Portal  ...")
 
 MyPortal = os.environ.get("PORTAL_URL")
 MyUserName = os.environ.get("PORTAL_USER")
@@ -25,7 +25,7 @@ MyMapName = os.environ.get("MAP_NAME")
 data_atual = datetime.now()
 dhProcessamento = data_atual.strftime("%d/%m/%Y %H:%M:%S")
 
-print("Acessando o Portal (online) ...")
+print("Acessando o Portal ...")
 
 try:
     arcpy.SignInToPortal(MyPortal, MyUserName, MyPassword)
@@ -35,7 +35,7 @@ except:
 print("Acesso confirmado !")
 
 outdir = os.environ.get("PROJECT_FOLDER")
-service_name = "HOTSPOT_AREAS_CVP"
+service_name = "RASTER_AREAS_CVLI"
 
 sddraft_filename = service_name + ".sddraft"
 sddraft_output_filename = os.path.join(outdir, sddraft_filename)
@@ -49,26 +49,26 @@ aprx = arcpy.mp.ArcGISProject(MyProject)
 # Mapa de referência
 m = aprx.listMaps(MyMapName)[0]
 
-for lyr in m.listLayers('HOTSPOT_ANALISE*'):
-    if lyr.name == "HOTSPOT_ANALISE_CVP_2023":
+for lyr in m.listLayers('SDE*'):
+    if lyr.name == "SDE.RASTER_CVLI_2023":
         lyr.visible = True
         lyr.transparency = 50
 
 # Rasters
 lyrs = []
-lyrs.append(m.listLayers('HOTSPOT_ANALISE_CVP_2023')[0])
+lyrs.append(m.listLayers('SDE.RASTER_CVLI_2023')[0])
 
-print("Preparando à camada HotSpot para publicação ...")
+print("Preparando à camada raster de CVLI para publicação ...")
 
 server_type = "HOSTING_SERVER"
 
 # Create FeatureSharingDraft and set metadata, portal folder, and export data properties
-sddraft = m.getWebLayerSharingDraft(server_type, "FEATURE", service_name, lyrs)
+sddraft = m.getWebLayerSharingDraft(server_type, "TILE", service_name, lyrs)
 
 sddraft.overwriteExistingService = True
-sddraft.summary = "Camadas de Rasters das areas de influencias - atualizada em: " + dhProcessamento
-sddraft.tags = "Rasters, Influencias, MVI2023, ARMAS2023, DROGAS2023, "
-sddraft.description = "Camadas de Rasters das areas de influencias - " + dhProcessamento
+sddraft.summary = "Camada de Raster de CVLI - atualizada em: " + dhProcessamento
+sddraft.tags = "Rasters, Influencias, CVLI2023 "
+sddraft.description = "Camada de Raster de CVLI - " + dhProcessamento
 sddraft.credits = "CHEII/SSPAL - Todos os Direitos reservados"
 sddraft.useLimitations = "Ilimitado"
 
@@ -77,7 +77,7 @@ print("Criando serviços para publicação ...")
 # Create Service Definition Draft file
 sddraft.exportToSDDraft(sddraft_output_filename)
 
-print("Preparando serviços para publicação ...")
+print("Preparando serviço para publicação ...")
 
 if arcpy.Exists(sd_output_filename):
     arcpy.Delete_management(sd_output_filename)
@@ -99,7 +99,7 @@ inPublic = "PUBLIC"
 inOrganization = "SHARE_ORGANIZATION"
 inGroups = [r"CHEII/SSPAL", "ABIN", "BMAL", r"PC/AL", "PF", r"PM2/PMAL", r"PP/AL", "Visualizadores"]
 
-print("Subindo às definições do serviço ...")
+print("Subindo à definição do serviço ...")
 
 if arcpy.Exists(inServiceName):
     arcpy.Delete_management(inServiceName)

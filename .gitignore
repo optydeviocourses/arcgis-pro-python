@@ -1,9 +1,14 @@
 .env
 *.bat
 ./Estudos
-./Process_Rasters//Rasters_Local
-./Process_Rasters//Rasters_All
-./Process_Rasters//Run_Tasks
+./Process_Rasters/Rasters_Local
+./Process_Rasters/Rasters_All
+./Process_Rasters/Run_Tasks
+
+./Process_Mosaic/Mosaic_Local
+./Process_Mosaic/Mosaic_Sde
+./Process_Mosaic/Mosaic_Sde
+
 ./Publish_Portal/Modelos
 ./Publish_Portal/Rasters
 .gitignore
