@@ -6,5 +6,5 @@
 ./Process_Rasters//Run_Tasks
 ./Publish_Portal/Modelos
 ./Publish_Portal/Rasters
-
+.gitignore
 GEOSSP.sde
