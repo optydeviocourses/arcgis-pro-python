@@ -14,7 +14,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-print("Criando Rasters CVP no Portal  ...")
+print("Publicando Hotspots Analysis de CVP no Portal  ...")
 
 MyPortal = os.environ.get("PORTAL_URL")
 MyUserName = os.environ.get("PORTAL_USER")
@@ -66,9 +66,9 @@ server_type = "HOSTING_SERVER"
 sddraft = m.getWebLayerSharingDraft(server_type, "FEATURE", service_name, lyrs)
 
 sddraft.overwriteExistingService = True
-sddraft.summary = "Camadas de Rasters das areas de influencias - atualizada em: " + dhProcessamento
-sddraft.tags = "Rasters, Influencias, MVI2023, ARMAS2023, DROGAS2023, "
-sddraft.description = "Camadas de Rasters das areas de influencias - " + dhProcessamento
+sddraft.summary = "Camada de Hotspots de CVP - atualizada em: " + dhProcessamento
+sddraft.tags = "Hotspots, Influencias, CVP2023"
+sddraft.description = "Camada de Hotspots de CVP - " + dhProcessamento
 sddraft.credits = "CHEII/SSPAL - Todos os Direitos reservados"
 sddraft.useLimitations = "Ilimitado"
 
@@ -105,11 +105,11 @@ if arcpy.Exists(inServiceName):
     arcpy.Delete_management(inServiceName)
 
 try:
-     # Compatilhando para o portal
     arcpy.server.UploadServiceDefinition(inSdFile, inServer, inServiceName,
                                         inCluster, inFolderType, inFolder,
                                         inStartup, inOverride, inMyContents,
                                         inPublic, inOrganization, inGroups)
-    print("Publicação realizada com sucesso !!!")
+    print("Publicação do Hotspots de CVP realizada com sucesso !!!")
 except:
-    print("Publicação com erros ! Tente novamente ...")
+    print(arcpy.GetMessages())
+    print("Erros na publicação do Hotspots de CVP ! Tente novamente ...")

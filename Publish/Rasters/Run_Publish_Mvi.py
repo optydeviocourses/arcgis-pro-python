@@ -112,4 +112,5 @@ try:
                                         inPublic, inOrganization, inGroups)
     print("Publicação realizada com sucesso !!!")
 except:
+    print(arcpy.GetMessages())
     print("Publicação com erros ! Tente novamente ...")

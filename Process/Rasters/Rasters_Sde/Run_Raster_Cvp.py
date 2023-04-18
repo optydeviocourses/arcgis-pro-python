@@ -83,4 +83,5 @@ try:
 
     print("Processo de Finalizado !!!")
 except:
+    print(arcpy.GetMessages())
     print("Problema no procesamento do raster! Tente novamente ...")

@@ -14,7 +14,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-print("Criando Rasters Arma no Portal  ...")
+print("Criando Rasters CVLI no Portal  ...")
 
 MyPortal = os.environ.get("PORTAL_URL")
 MyUserName = os.environ.get("PORTAL_USER")
@@ -35,7 +35,7 @@ except:
 print("Acesso confirmado !")
 
 outdir = os.environ.get("PROJECT_FOLDER")
-service_name = "RASTERS_AREAS_ARMAS"
+service_name = "RASTER_AREAS_CVLI"
 
 sddraft_filename = service_name + ".sddraft"
 sddraft_output_filename = os.path.join(outdir, sddraft_filename)
@@ -50,15 +50,15 @@ aprx = arcpy.mp.ArcGISProject(MyProject)
 m = aprx.listMaps(MyMapName)[0]
 
 for lyr in m.listLayers('SDE*'):
-    if lyr.name == "SDE.RASTER_ARMA_2023":
+    if lyr.name == "SDE.RASTER_CVLI_2023":
         lyr.visible = True
         lyr.transparency = 50
 
 # Rasters
 lyrs = []
-lyrs.append(m.listLayers('SDE.RASTER_ARMA_2023')[0])
+lyrs.append(m.listLayers('SDE.RASTER_CVLI_2023')[0])
 
-print("Preparando à camada raster de Armas para publicação ...")
+print("Preparando à camada raster de CVLI para publicação ...")
 
 server_type = "HOSTING_SERVER"
 
@@ -66,9 +66,9 @@ server_type = "HOSTING_SERVER"
 sddraft = m.getWebLayerSharingDraft(server_type, "TILE", service_name, lyrs)
 
 sddraft.overwriteExistingService = True
-sddraft.summary = "Camada de Raster de Armas - atualizada em: " + dhProcessamento
-sddraft.tags = "Rasters, Influencias, ARMAS2023, "
-sddraft.description = "Camada de Raster de Armas  - " + dhProcessamento
+sddraft.summary = "Camada de Raster de CVLI - atualizada em: " + dhProcessamento
+sddraft.tags = "Rasters, Influencias, CVLI2023 "
+sddraft.description = "Camada de Raster de CVLI - " + dhProcessamento
 sddraft.credits = "CHEII/SSPAL - Todos os Direitos reservados"
 sddraft.useLimitations = "Ilimitado"
 
@@ -77,7 +77,7 @@ print("Criando serviços para publicação ...")
 # Create Service Definition Draft file
 sddraft.exportToSDDraft(sddraft_output_filename)
 
-print("Preparando serviços para publicação ...")
+print("Preparando serviço para publicação ...")
 
 if arcpy.Exists(sd_output_filename):
     arcpy.Delete_management(sd_output_filename)
@@ -99,7 +99,7 @@ inPublic = "PUBLIC"
 inOrganization = "SHARE_ORGANIZATION"
 inGroups = [r"CHEII/SSPAL", "ABIN", "BMAL", r"PC/AL", "PF", r"PM2/PMAL", r"PP/AL", "Visualizadores"]
 
-print("Subindo às definições do serviço ...")
+print("Subindo à definição do serviço ...")
 
 if arcpy.Exists(inServiceName):
     arcpy.Delete_management(inServiceName)
@@ -112,5 +112,4 @@ try:
                                         inPublic, inOrganization, inGroups)
     print("Publicação realizada com sucesso !!!")
 except:
-    print(arcpy.GetMessages())
     print("Publicação com erros ! Tente novamente ...")
