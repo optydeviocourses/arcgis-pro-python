@@ -34,7 +34,7 @@ localDataStore = os.environ.get("DATASTORE_GDB")
 local_raster_name = "RASTER_DROGA_2023"
 out_local_raster = os.path.join(localDataStore, local_raster_name)
 
-local_mosaic_name = "MOSAIC_DROGAA_2023"
+local_mosaic_name = "MOSAIC_DROGA_2023"
 out_local_mosaic = os.path.join(localDataStore, local_mosaic_name)
 
 mdname = out_local_mosaic

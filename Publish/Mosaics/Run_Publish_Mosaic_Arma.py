@@ -14,7 +14,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-print("Publicando o Mosaico de CVLI/MVI no Portal SSPAL (arcGIS Online)  ...")
+print("Publicando o Mosaico de Armas no Portal SSPAL (arcGIS Online)  ...")
 
 MyPortal = os.environ.get("PORTAL_URL")
 MyUserName = os.environ.get("PORTAL_USER")
@@ -34,10 +34,8 @@ except:
     print(arcpy.GetMessages())
     print("Portal SSPAL indisponível !")
 
-print("Acesso confirmado !")
-
 outdir = os.environ.get("PROJECT_FOLDER")
-service_name = "MOSAICO_CVLI_2023"
+service_name = "MOSAICO_ARMA_2023"
 
 sddraft_filename = service_name + ".sddraft"
 sddraft_output_filename = os.path.join(outdir, sddraft_filename)
@@ -51,16 +49,16 @@ aprx = arcpy.mp.ArcGISProject(MyProject)
 # Mapa de referência
 m = aprx.listMaps(MyMapName)[0]
 
-for lyr in m.listLayers('MOSAIC_CVLI*'):
-    if lyr.name == "MOSAIC_CVLI_2023":
+for lyr in m.listLayers('MOSAIC_ARMA*'):
+    if lyr.name == "MOSAIC_ARMA_2023":
         lyr.visible = True
         lyr.transparency = 50
 
 # Rasters
 lyrs = []
-lyrs.append(m.listLayers('MOSAIC_CVLI_2023')[0])
+lyrs.append(m.listLayers('MOSAIC_ARMA_2023')[0])
 
-print("Preparando o Mosaico de CVLI/MVI para publicação ...")
+print("Preparando o Mosaico de ARMA/ARMA para publicação ...")
 
 server_type = "HOSTING_SERVER"
 
@@ -68,9 +66,9 @@ server_type = "HOSTING_SERVER"
 sddraft = m.getWebLayerSharingDraft(server_type, "TILE", service_name, lyrs)
 
 sddraft.overwriteExistingService = True
-sddraft.summary = "Camadas de Mosaico de CVLI/MVI - atualizada em: " + dhProcessamento
-sddraft.tags = "Mosaico, Rasters, Influencias, MVI2023, ARMAS2023, DROGAS2023 "
-sddraft.description = "Camadas de Mosaico de CVLI/MVI - " + dhProcessamento
+sddraft.summary = "Camadas de Mosaico de ARMA/ARMA - atualizada em: " + dhProcessamento
+sddraft.tags = "Mosaico, Rasters, Influencias, ARMAS2023 "
+sddraft.description = "Camadas de Mosaico de ARMA/ARMA - " + dhProcessamento
 sddraft.credits = "CHEII/SSPAL - Todos os Direitos reservados"
 sddraft.useLimitations = "Ilimitado"
 
@@ -111,7 +109,7 @@ try:
                                         inCluster, inFolderType, inFolder,
                                         inStartup, inOverride, inMyContents,
                                         inPublic, inOrganization, inGroups)
-    print("Publicação do Mosaico de CVLI/MVI realizada com sucesso !!!")
+    print("Publicação do Mosaico de Armas realizada com sucesso !!!")
 except:
     print(arcpy.GetMessages())
-    print("Erros na publicação do o Mosaico de CVLI/MVI ! Tente novamente ...")
+    print("Erros na publicação do o Mosaico de Armas ! Tente novamente ...")

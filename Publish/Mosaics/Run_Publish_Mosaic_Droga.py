@@ -14,7 +14,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-print("Criando Rasters CVLI no Portal  ...")
+print("Publicando o Mosaico de Drogas no Portal SSPAL (arcGIS Online)  ...")
 
 MyPortal = os.environ.get("PORTAL_URL")
 MyUserName = os.environ.get("PORTAL_USER")
@@ -25,17 +25,19 @@ MyMapName = os.environ.get("MAP_NAME")
 data_atual = datetime.now()
 dhProcessamento = data_atual.strftime("%d/%m/%Y %H:%M:%S")
 
-print("Acessando o Portal ...")
+print("Acessando o Portal SSPAL (arcGIS Online) ...")
 
 try:
     arcpy.SignInToPortal(MyPortal, MyUserName, MyPassword)
+    print("Acesso confirmado !")
 except:
+    print(arcpy.GetMessages())
     print("Portal SSPAL indisponível !")
 
 print("Acesso confirmado !")
 
 outdir = os.environ.get("PROJECT_FOLDER")
-service_name = "RASTER_AREAS_CVLI"
+service_name = "MOSAICO_DROGA_2023"
 
 sddraft_filename = service_name + ".sddraft"
 sddraft_output_filename = os.path.join(outdir, sddraft_filename)
@@ -49,26 +51,26 @@ aprx = arcpy.mp.ArcGISProject(MyProject)
 # Mapa de referência
 m = aprx.listMaps(MyMapName)[0]
 
-for lyr in m.listLayers('SDE*'):
-    if lyr.name == "SDE.RASTER_CVLI_2023":
+for lyr in m.listLayers('MOSAIC_DROGA*'):
+    if lyr.name == "MOSAIC_DROGA_2023":
         lyr.visible = True
         lyr.transparency = 50
 
 # Rasters
 lyrs = []
-lyrs.append(m.listLayers('SDE.RASTER_CVLI_2023')[0])
+lyrs.append(m.listLayers('MOSAIC_DROGA_2023')[0])
 
-print("Preparando à camada raster de CVLI para publicação ...")
+print("Preparando o Mosaico de DROGA/MVI para publicação ...")
 
 server_type = "HOSTING_SERVER"
 
-# Create FeatureSharingDraft and set metadata, portal folder, and export data properties
+
 sddraft = m.getWebLayerSharingDraft(server_type, "TILE", service_name, lyrs)
 
 sddraft.overwriteExistingService = True
-sddraft.summary = "Camada de Raster de CVLI - atualizada em: " + dhProcessamento
-sddraft.tags = "Rasters, Influencias, CVLI2023 "
-sddraft.description = "Camada de Raster de CVLI - " + dhProcessamento
+sddraft.summary = "Camadas de Mosaico de DROGA/MVI - atualizada em: " + dhProcessamento
+sddraft.tags = "Mosaico, Rasters, Influencias, MVI2023, ARMAS2023, DROGAS2023 "
+sddraft.description = "Camadas de Mosaico de DROGA/MVI - " + dhProcessamento
 sddraft.credits = "CHEII/SSPAL - Todos os Direitos reservados"
 sddraft.useLimitations = "Ilimitado"
 
@@ -77,7 +79,7 @@ print("Criando serviços para publicação ...")
 # Create Service Definition Draft file
 sddraft.exportToSDDraft(sddraft_output_filename)
 
-print("Preparando serviço para publicação ...")
+print("Preparando serviços para publicação ...")
 
 if arcpy.Exists(sd_output_filename):
     arcpy.Delete_management(sd_output_filename)
@@ -99,17 +101,17 @@ inPublic = "PUBLIC"
 inOrganization = "SHARE_ORGANIZATION"
 inGroups = [r"CHEII/SSPAL", "ABIN", "BMAL", r"PC/AL", "PF", r"PM2/PMAL", r"PP/AL", "Visualizadores"]
 
-print("Subindo à definição do serviço ...")
+print("Subindo às definições do serviço ...")
 
 if arcpy.Exists(inServiceName):
     arcpy.Delete_management(inServiceName)
 
 try:
-     # Compatilhando para o portal
     arcpy.server.UploadServiceDefinition(inSdFile, inServer, inServiceName,
                                         inCluster, inFolderType, inFolder,
                                         inStartup, inOverride, inMyContents,
                                         inPublic, inOrganization, inGroups)
-    print("Publicação realizada com sucesso !!!")
+    print("Publicação do Mosaico de DROGA/MVI realizada com sucesso !!!")
 except:
-    print("Publicação com erros ! Tente novamente ...")
+    print(arcpy.GetMessages())
+    print("Erros na publicação do o Mosaico de DROGA/MVI ! Tente novamente ...")

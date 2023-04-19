@@ -29,9 +29,7 @@ print("Acessando o Portal SSPAL (arcGIS Online) ...")
 
 try:
     arcpy.SignInToPortal(MyPortal, MyUserName, MyPassword)
-    print("Acesso confirmado !")
 except:
-    print(arcpy.GetMessages())
     print("Portal SSPAL indisponível !")
 
 print("Acesso confirmado !")
@@ -51,14 +49,24 @@ aprx = arcpy.mp.ArcGISProject(MyProject)
 # Mapa de referência
 m = aprx.listMaps(MyMapName)[0]
 
-for lyr in m.listLayers('MOSAIC_CVLI*'):
+for lyr in m.listLayers('MOSAIC_*'):
     if lyr.name == "MOSAIC_CVLI_2023":
+        lyr.visible = True
+        lyr.transparency = 50
+
+    if lyr.name == "MOSAIC_ARMA_2023":
+        lyr.visible = True
+        lyr.transparency = 50
+
+    if lyr.name == "MOSAIC_DROGA_2023":
         lyr.visible = True
         lyr.transparency = 50
 
 # Rasters
 lyrs = []
 lyrs.append(m.listLayers('MOSAIC_CVLI_2023')[0])
+lyrs.append(m.listLayers('MOSAIC_ARMA_2023')[0])
+lyrs.append(m.listLayers('MOSAIC_DROGA_2023')[0])
 
 print("Preparando o Mosaico de CVLI/MVI para publicação ...")
 
