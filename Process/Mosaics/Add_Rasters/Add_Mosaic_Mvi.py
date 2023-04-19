@@ -74,4 +74,5 @@ try:
 
      print("Adição do Raster no Mosaico de CVLI realizada com sucesso !!!")
 except:
+     print(arcpy.GetMessages())
      print("Erro na adição do Raster no Mosaico de CVLI ! Tente novamente ...")

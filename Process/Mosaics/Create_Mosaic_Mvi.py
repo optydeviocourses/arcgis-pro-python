@@ -51,4 +51,5 @@ try:
                                         wavelength)
     print("Criação do Mosaico de CVLI realizada com sucesso !!!")
 except:
+    print(arcpy.GetMessages())
     print("Erro na criação do Mosaico de CVLI ! Tente novamente ...")

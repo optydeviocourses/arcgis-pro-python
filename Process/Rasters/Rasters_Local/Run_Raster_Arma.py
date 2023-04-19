@@ -56,25 +56,29 @@ buildRat = "DO_NOT_BUILD"
 print("Stage 2 - Raster Table - Processando Raster na GeoDatabase Local ...")
 
 # Run PointToRaster in Portal DataStore
-arcpy.conversion.PointToRaster(out_local_point_table, valField,
-                               out_local_raster, assignmentType,
-                               priorityField, cellSize, buildRat)
+try:    
+    arcpy.conversion.PointToRaster(out_local_point_table, valField,
+                                out_local_raster, assignmentType,
+                                priorityField, cellSize, buildRat)
 
-# Ajuste para cor unica de raster
-local_vegras = Raster(out_local_raster)
-local_vegras.readOnly = False
+    # Ajuste para cor unica de raster
+    local_vegras = Raster(out_local_raster)
+    local_vegras.readOnly = False
 
-for r, c in local_vegras:
-    #print(i, j, vegras[i, j])
-    v = local_vegras[r, c]
-    # Check for NoData
-    if math.isnan(v):
-        # Write NoData to outRaster
-        local_vegras[r, c] = math.nan
-    else:
-        # Write v to outRaster
-        local_vegras[r, c] = 5
+    for r, c in local_vegras:
+        #print(i, j, vegras[i, j])
+        v = local_vegras[r, c]
+        # Check for NoData
+        if math.isnan(v):
+            # Write NoData to outRaster
+            local_vegras[r, c] = math.nan
+        else:
+            # Write v to outRaster
+            local_vegras[r, c] = 5
 
-local_vegras.save()
+    local_vegras.save()
 
-print("Processo Finalizado !!!")
+    print("Processo Finalizado !!!")
+except:
+    print(arcpy.GetMessages())
+    print("Erro ao processar Raster !!!")

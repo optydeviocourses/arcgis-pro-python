@@ -51,4 +51,5 @@ try:
                                         wavelength)
     print("Criação do Mosaico de Armas realizada com sucesso !!!")
 except:
+    print(arcpy.GetMessages())
     print("Erro na criação do Mosaico de Armas ! Tente novamente ...")

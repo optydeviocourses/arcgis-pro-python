@@ -73,4 +73,5 @@ try:
 
      print("Adição do Raster no Mosaico de Drogas realizada com sucesso !!!")
 except:
+     print(arcpy.GetMessages())
      print("Erro na adição do Raster no Mosaico de Drogas ! Tente novamente ...")
