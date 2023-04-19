@@ -35,7 +35,7 @@ except:
 print("Acesso confirmado !")
 
 outdir = os.environ.get("PROJECT_FOLDER")
-service_name = "RASTER_AREAS_CVLI"
+service_name = "RASTERS_AREAS_CVLI"
 
 sddraft_filename = service_name + ".sddraft"
 sddraft_output_filename = os.path.join(outdir, sddraft_filename)
