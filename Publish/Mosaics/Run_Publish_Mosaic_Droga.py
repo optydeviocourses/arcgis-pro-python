@@ -34,8 +34,6 @@ except:
     print(arcpy.GetMessages())
     print("Portal SSPAL indisponível !")
 
-print("Acesso confirmado !")
-
 outdir = os.environ.get("PROJECT_FOLDER")
 service_name = "MOSAICO_DROGA_2023"
 
@@ -68,9 +66,9 @@ server_type = "HOSTING_SERVER"
 sddraft = m.getWebLayerSharingDraft(server_type, "TILE", service_name, lyrs)
 
 sddraft.overwriteExistingService = True
-sddraft.summary = "Camadas de Mosaico de DROGA/MVI - atualizada em: " + dhProcessamento
-sddraft.tags = "Mosaico, Rasters, Influencias, MVI2023, ARMAS2023, DROGAS2023 "
-sddraft.description = "Camadas de Mosaico de DROGA/MVI - " + dhProcessamento
+sddraft.summary = "Camadas de Mosaico de Drogas - atualizada em: " + dhProcessamento
+sddraft.tags = "Mosaico, Rasters, Influencias, DROGAS2023 "
+sddraft.description = "Camadas de Mosaico de Drogas - " + dhProcessamento
 sddraft.credits = "CHEII/SSPAL - Todos os Direitos reservados"
 sddraft.useLimitations = "Ilimitado"
 
@@ -111,7 +109,7 @@ try:
                                         inCluster, inFolderType, inFolder,
                                         inStartup, inOverride, inMyContents,
                                         inPublic, inOrganization, inGroups)
-    print("Publicação do Mosaico de DROGA/MVI realizada com sucesso !!!")
+    print("Publicação do Mosaico de Drogas realizada com sucesso !!!")
 except:
     print(arcpy.GetMessages())
-    print("Erros na publicação do o Mosaico de DROGA/MVI ! Tente novamente ...")
+    print("Erros na publicação do o Mosaico de Drogas ! Tente novamente ...")

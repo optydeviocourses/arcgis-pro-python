@@ -34,8 +34,6 @@ except:
     print(arcpy.GetMessages())
     print("Portal SSPAL indisponível !")
 
-print("Acesso confirmado !")
-
 outdir = os.environ.get("PROJECT_FOLDER")
 service_name = "MOSAICO_CVLI_2023"
 
@@ -63,7 +61,6 @@ lyrs.append(m.listLayers('MOSAIC_CVLI_2023')[0])
 print("Preparando o Mosaico de CVLI/MVI para publicação ...")
 
 server_type = "HOSTING_SERVER"
-
 
 sddraft = m.getWebLayerSharingDraft(server_type, "TILE", service_name, lyrs)
 

@@ -58,7 +58,7 @@ for lyr in m.listLayers('MOSAIC_ARMA*'):
 lyrs = []
 lyrs.append(m.listLayers('MOSAIC_ARMA_2023')[0])
 
-print("Preparando o Mosaico de ARMA/ARMA para publicação ...")
+print("Preparando o Mosaico de Armas para publicação ...")
 
 server_type = "HOSTING_SERVER"
 
@@ -66,9 +66,9 @@ server_type = "HOSTING_SERVER"
 sddraft = m.getWebLayerSharingDraft(server_type, "TILE", service_name, lyrs)
 
 sddraft.overwriteExistingService = True
-sddraft.summary = "Camadas de Mosaico de ARMA/ARMA - atualizada em: " + dhProcessamento
+sddraft.summary = "Camadas de Mosaico de Armas - atualizada em: " + dhProcessamento
 sddraft.tags = "Mosaico, Rasters, Influencias, ARMAS2023 "
-sddraft.description = "Camadas de Mosaico de ARMA/ARMA - " + dhProcessamento
+sddraft.description = "Camadas de Mosaico de Armas - " + dhProcessamento
 sddraft.credits = "CHEII/SSPAL - Todos os Direitos reservados"
 sddraft.useLimitations = "Ilimitado"
 
