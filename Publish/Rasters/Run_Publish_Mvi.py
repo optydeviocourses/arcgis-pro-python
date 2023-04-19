@@ -105,7 +105,6 @@ if arcpy.Exists(inServiceName):
     arcpy.Delete_management(inServiceName)
 
 try:
-     # Compatilhando para o portal
     arcpy.server.UploadServiceDefinition(inSdFile, inServer, inServiceName,
                                         inCluster, inFolderType, inFolder,
                                         inStartup, inOverride, inMyContents,
