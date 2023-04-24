@@ -14,7 +14,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-print("Criando Rasters no Portal  ...")
+print("Publicando última posição dos Recursos no Portal (arcGIS Online)  ...")
 
 MyPortal = os.environ.get("PORTAL_URL")
 MyUserName = os.environ.get("PORTAL_USER")
@@ -25,17 +25,17 @@ MyMapName = os.environ.get("MAP_NAME")
 data_atual = datetime.now()
 dhProcessamento = data_atual.strftime("%d/%m/%Y %H:%M:%S")
 
-print("Acessando o Portal ...")
+print("Acessando o Portal (arcGIS Online) ...")
 
 try:
     arcpy.SignInToPortal(MyPortal, MyUserName, MyPassword)
 except:
-    print("Portal SSPAL indisponível !")
+    print("Portal SSPAL (arcGIS Online) indisponível !")
 
 print("Acesso confirmado !")
 
 outdir = os.environ.get("PROJECT_FOLDER")
-service_name = "RASTERS_AREAS_CRIMINAIS"
+service_name = "CAM_ULTIMO_RECURSOS"
 
 sddraft_filename = service_name + ".sddraft"
 sddraft_output_filename = os.path.join(outdir, sddraft_filename)
@@ -43,50 +43,39 @@ sddraft_output_filename = os.path.join(outdir, sddraft_filename)
 sd_filename = service_name + ".sd"
 sd_output_filename = os.path.join(outdir, sd_filename)
 
-# Mapa de referência para a publicação
 aprx = arcpy.mp.ArcGISProject(MyProject)
 
 # Mapa de referência
 m = aprx.listMaps(MyMapName)[0]
 
-for lyr in m.listLayers('SDE*'):
-    if lyr.name == "SDE.RASTER_CVLI_2023":
-        lyr.visible = True
-        lyr.transparency = 50
-    if lyr.name == "SDE.RASTER_ARMA_2023":
-        lyr.visible = True
-        lyr.transparency = 50
-    if lyr.name == "SDE.RASTER_DROGA_2023":
+for lyr in m.listLayers('SDE.TB_CAM_RADIO_DIG*'):
+    if lyr.name == "SDE.TB_CAM_RADIO_DIG":
         lyr.visible = True
         lyr.transparency = 50
 
 # Rasters
 lyrs = []
-lyrs.append(m.listLayers('SDE.RASTER_CVLI_2023')[0])
+lyrs.append(m.listLayers('SDE.TB_CAM_RADIO_DIG')[0])
 
-lyrs.append(m.listLayers('SDE.RASTER_ARMA_2023')[0])
-lyrs.append(m.listLayers('SDE.RASTER_DROGA_2023')[0])
-
-print("Preparando às camadas rasters para publicação ...")
+print("Preparando à camada última posição dos Recursos para publicação ...")
 
 server_type = "HOSTING_SERVER"
 
-# Create FeatureSharingDraft and set metadata, portal folder, and export data properties
-sddraft = m.getWebLayerSharingDraft(server_type, "TILE", service_name, lyrs)
+sddraft = m.getWebLayerSharingDraft(server_type, "FEATURE", service_name, lyrs)
 
 sddraft.overwriteExistingService = True
-sddraft.summary = "Camadas de Rasters das areas de influencias - atualizada em: " + dhProcessamento
-sddraft.tags = "Rasters, Influencias, MVI2023, ARMAS2023, DROGAS2023, "
-sddraft.description = "Camadas de Rasters das areas de influencias - " + dhProcessamento
+sddraft.summary = "Camada última posição dos Recursos - atualizada em: " + dhProcessamento
+sddraft.tags = "CAD, Recursos, Viaturas, Rádios, Postos Fixos, Motos"
+sddraft.description = "Camada última posição dos Recursos - " + dhProcessamento
 sddraft.credits = "CHEII/SSPAL - Todos os Direitos reservados"
 sddraft.useLimitations = "Ilimitado"
 
-print("Criando serviços para publicação ...")
+print("Criando serviço para publicação ...")
 
 # Create Service Definition Draft file
 sddraft.exportToSDDraft(sddraft_output_filename)
 
-print("Preparando serviços para publicação ...")
+print("Preparando serviço para publicação ...")
 
 if arcpy.Exists(sd_output_filename):
     arcpy.Delete_management(sd_output_filename)
@@ -114,12 +103,11 @@ if arcpy.Exists(inServiceName):
     arcpy.Delete_management(inServiceName)
 
 try:
-     # Compatilhando para o portal
     arcpy.server.UploadServiceDefinition(inSdFile, inServer, inServiceName,
                                         inCluster, inFolderType, inFolder,
                                         inStartup, inOverride, inMyContents,
                                         inPublic, inOrganization, inGroups)
-    print("Publicação realizada com sucesso !!!")
+    print("Publicação da última posição dos Recursos realizada com sucesso !!!")
 except:
     print(arcpy.GetMessages())
-    print("Publicação com erros ! Tente novamente ...")
+    print("Erros na publicação da última posição dos Recursos ! Tente novamente ...")
