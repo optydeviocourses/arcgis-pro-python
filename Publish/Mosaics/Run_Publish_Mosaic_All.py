@@ -14,7 +14,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-print("Publicando o Mosaico de CVLI/MVI no Portal SSPAL (arcGIS Online)  ...")
+print("Publicando o Mosaico das Áreas Criminais no Portal SSPAL (arcGIS Online)  ...")
 
 MyPortal = os.environ.get("PORTAL_URL")
 MyUserName = os.environ.get("PORTAL_USER")
@@ -35,7 +35,7 @@ except:
 print("Acesso confirmado !")
 
 outdir = os.environ.get("PROJECT_FOLDER")
-service_name = "MOSAICO_CVLI_2023"
+service_name = "MOSAICO_AREAS_CRIMINAIS"
 
 sddraft_filename = service_name + ".sddraft"
 sddraft_output_filename = os.path.join(outdir, sddraft_filename)
@@ -43,10 +43,8 @@ sddraft_output_filename = os.path.join(outdir, sddraft_filename)
 sd_filename = service_name + ".sd"
 sd_output_filename = os.path.join(outdir, sd_filename)
 
-# Mapa de referência para a publicação
 aprx = arcpy.mp.ArcGISProject(MyProject)
 
-# Mapa de referência
 m = aprx.listMaps(MyMapName)[0]
 
 for lyr in m.listLayers('MOSAIC_*'):
@@ -68,10 +66,9 @@ lyrs.append(m.listLayers('MOSAIC_CVLI_2023')[0])
 lyrs.append(m.listLayers('MOSAIC_ARMA_2023')[0])
 lyrs.append(m.listLayers('MOSAIC_DROGA_2023')[0])
 
-print("Preparando o Mosaico de CVLI/MVI para publicação ...")
+print("Preparando o Mosaico das Áreas Criminais para publicação ...")
 
 server_type = "HOSTING_SERVER"
-
 
 sddraft = m.getWebLayerSharingDraft(server_type, "TILE", service_name, lyrs)
 
@@ -122,4 +119,4 @@ try:
     print("Publicação do Mosaico de CVLI/MVI realizada com sucesso !!!")
 except:
     print(arcpy.GetMessages())
-    print("Erros na publicação do o Mosaico de CVLI/MVI ! Tente novamente ...")
+    print(r"\nErros na publicação do o Mosaico de CVLI/MVI ! Tente novamente ...")
