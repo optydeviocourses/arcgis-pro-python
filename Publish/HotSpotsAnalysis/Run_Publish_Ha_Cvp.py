@@ -62,7 +62,6 @@ print("Preparando à camada HotSpot para publicação ...")
 
 server_type = "HOSTING_SERVER"
 
-# Create FeatureSharingDraft and set metadata, portal folder, and export data properties
 sddraft = m.getWebLayerSharingDraft(server_type, "FEATURE", service_name, lyrs)
 
 sddraft.overwriteExistingService = True
