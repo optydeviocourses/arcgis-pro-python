@@ -104,12 +104,12 @@ print("Subindo à definição do serviço ...")
 if arcpy.Exists(inServiceName):
     arcpy.Delete_management(inServiceName)
 
-try:
-    arcpy.server.UploadServiceDefinition(inSdFile, inServer, inServiceName,
-                                        inCluster, inFolderType, inFolder,
-                                        inStartup, inOverride, inMyContents,
-                                        inPublic, inOrganization, inGroups)
-    print("Publicação realizada com sucesso !!!")
-except:
-    print(arcpy.GetMessages())
-    print("Publicação com erros ! Tente novamente ...")
+#try:
+arcpy.server.UploadServiceDefinition(inSdFile, inServer, inServiceName,
+                                    inCluster, inFolderType, inFolder,
+                                    inStartup, inOverride, inMyContents,
+                                    inPublic, inOrganization, inGroups)
+print("Publicação realizada com sucesso !!!")
+#except:
+#    print(arcpy.GetMessages())
+#    print("Publicação com erros ! Tente novamente ...")
