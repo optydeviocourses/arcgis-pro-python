@@ -52,7 +52,9 @@ m = aprx.listMaps(MyMapName)[0]
 for lyr in m.listLayers('SDE*'):
     if lyr.name == "SDE.RASTER_DROGA_2023":
         lyr.visible = True
-        lyr.transparency = 50
+        lyr.transparency = 60
+        lyr.maxThreshold = 0
+        lyr.minThreshold = 0
 
 # Rasters
 lyrs = []
@@ -114,3 +116,15 @@ try:
 except:
     print(arcpy.GetMessages())
     print("Publicação com erros ! Tente novamente ...")
+
+    os.system("cls")
+    print("Tentando novamente ...")
+    try:
+        arcpy.server.UploadServiceDefinition(inSdFile, inServer, inServiceName,
+                                        inCluster, inFolderType, inFolder,
+                                        inStartup, inOverride, inMyContents,
+                                        inPublic, inOrganization, inGroups)
+        print("Publicação realizada com sucesso !!!")
+    except:
+        print(arcpy.GetMessages())
+        print("Publicação com erros !!! Tente novamente ...")

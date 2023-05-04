@@ -14,28 +14,35 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-print("Publicando última posição dos Recursos no Portal (arcGIS Online)  ...")
+print("Criando Rasters CVLI no Portal  ...")
 
 MyPortal = os.environ.get("PORTAL_URL")
 MyUserName = os.environ.get("PORTAL_USER")
 MyPassword = os.environ.get("PORTAL_PWD")
 MyProject = os.environ.get("PROJECT_NAME")
 MyMapName = os.environ.get("MAP_NAME")
+MyDataSource = os.environ.get("PROJECT_DATASTORE_SDE")
+MyDataSourceLocal = os.environ.get("PROJECT_DATASTORE_GDB")
+MyTileScheme = os.environ.get("RES_ARCGIS_PRO_TS_CGCS2000_LOCAL")
+MyEscalaView = os.environ.get("ESCALA_VIEW")
 
 data_atual = datetime.now()
 dhProcessamento = data_atual.strftime("%d/%m/%Y %H:%M:%S")
 
-print("Acessando o Portal (arcGIS Online) ...")
+print("Acessando o Portal ...")
 
 try:
     arcpy.SignInToPortal(MyPortal, MyUserName, MyPassword)
 except:
-    print("Portal SSPAL (arcGIS Online) indisponível !")
+    print("Portal SSPAL indisponível !")
 
 print("Acesso confirmado !")
 
 outdir = os.environ.get("PROJECT_FOLDER")
-service_name = "CAM_ULTIMO_RECURSOS"
+service_name = "MOSAIC_CVLI_2023"
+
+if arcpy.Exists(service_name):
+    arcpy.Delete_management(service_name)
 
 sddraft_filename = service_name + ".sddraft"
 sddraft_output_filename = os.path.join(outdir, sddraft_filename)
@@ -45,32 +52,30 @@ sd_output_filename = os.path.join(outdir, sd_filename)
 
 aprx = arcpy.mp.ArcGISProject(MyProject)
 
-# Mapa de referência
 m = aprx.listMaps(MyMapName)[0]
 
-for lyr in m.listLayers('SDE.TB_CAM_RADIO_DIG*'):
-    if lyr.name == "SDE.TB_CAM_RADIO_DIG":
+for lyr in m.listLayers('*'):
+    if lyr.name == "MOSAIC_CVLI_2023":
         lyr.visible = True
-        lyr.transparency = 50
+        lyr.transparency = 60
 
 # Rasters
 lyrs = []
-lyrs.append(m.listLayers('SDE.TB_CAM_RADIO_DIG')[0])
+lyrs.append(m.listLayers('MOSAIC_CVLI_2023')[0])
 
-print("Preparando à camada última posição dos Recursos para publicação ...")
+print("Preparando à camada raster de CVLI para publicação ...")
 
 server_type = "HOSTING_SERVER"
 
-sddraft = m.getWebLayerSharingDraft(server_type, "FEATURE", service_name, lyrs)
-
+sddraft = m.getWebLayerSharingDraft(server_type, "TILE", service_name, lyrs)
 sddraft.overwriteExistingService = True
-sddraft.summary = "Camada última posição dos Recursos - atualizada em: " + dhProcessamento
-sddraft.tags = "CAD, Recursos, Viaturas, Rádios, Postos Fixos, Motos"
-sddraft.description = "Camada última posição dos Recursos - " + dhProcessamento
+sddraft.summary = "Camada de Raster de CVLI - atualizada em: " + dhProcessamento
+sddraft.tags = "Rasters, Influencias, CVLI2023"
+sddraft.description = "Camada de Raster de CVLI - " + dhProcessamento
 sddraft.credits = "CHEII/SSPAL - Todos os Direitos reservados"
 sddraft.useLimitations = "Ilimitado"
 
-print("Criando serviço para publicação ...")
+print("Criando serviços para publicação ...")
 
 # Create Service Definition Draft file
 sddraft.exportToSDDraft(sddraft_output_filename)
@@ -80,7 +85,6 @@ print("Preparando serviço para publicação ...")
 if arcpy.Exists(sd_output_filename):
     arcpy.Delete_management(sd_output_filename)
 
-# Stage Service para à publicação
 arcpy.server.StageService(sddraft_output_filename, sd_output_filename)
 
 # Variaveis para definir o upload/compartilhamento do serviço
@@ -97,40 +101,18 @@ inPublic = "PUBLIC"
 inOrganization = "SHARE_ORGANIZATION"
 inGroups = [r"CHEII/SSPAL", "ABIN", "BMAL", r"PC/AL", "PF", r"PM2/PMAL", r"PP/AL", "Visualizadores"]
 
-print("Subindo às definições do serviço ...")
+print("Subindo à definição do serviço ...")
 
 if arcpy.Exists(inServiceName):
     arcpy.Delete_management(inServiceName)
-
-if arcpy.Exists("0123456789ABCDEF"):
-    arcpy.Delete_management("0123456789ABCDEF")
 
 try:
     arcpy.server.UploadServiceDefinition(inSdFile, inServer, inServiceName,
                                         inCluster, inFolderType, inFolder,
                                         inStartup, inOverride, inMyContents,
                                         inPublic, inOrganization, inGroups)
-    print("Publicação da última posição dos Recursos realizada com sucesso !!!")
+    print("Publicação realizada com sucesso !!!")
 except:
     print(arcpy.GetMessages())
     print("Publicação com erros ! Tente novamente ...")
     print("Tentando novamente ...")
-    try:
-        arcpy.server.UploadServiceDefinition(inSdFile, inServer, inServiceName,
-                                        inCluster, inFolderType, inFolder,
-                                        inStartup, inOverride, inMyContents,
-                                        inPublic, inOrganization, inGroups)
-        print("Publicação realizada com sucesso !!!")
-    except:
-        print(arcpy.GetMessages())
-        print("Publicação com erros ! Tente novamente ...")
-        print("Tentando novamente ...")
-        try:
-            arcpy.server.UploadServiceDefinition(inSdFile, inServer, inServiceName,
-                                            inCluster, inFolderType, inFolder,
-                                            inStartup, inOverride, inMyContents,
-                                            inPublic, inOrganization, inGroups)
-            print("Publicação realizada com sucesso !!!")
-        except:
-            print(arcpy.GetMessages())
-            print("Erros na publicação da última posição dos Recursos ! Tente novamente ...")

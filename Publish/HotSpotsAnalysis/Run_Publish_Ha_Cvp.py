@@ -103,6 +103,9 @@ print("Subindo às definições do serviço ...")
 if arcpy.Exists(inServiceName):
     arcpy.Delete_management(inServiceName)
 
+if arcpy.Exists("0123456789ABCDEF"):
+    arcpy.Delete_management("0123456789ABCDEF")
+
 try:
     arcpy.server.UploadServiceDefinition(inSdFile, inServer, inServiceName,
                                         inCluster, inFolderType, inFolder,
@@ -111,4 +114,14 @@ try:
     print("Publicação do Hotspots de CVP realizada com sucesso !!!")
 except:
     print(arcpy.GetMessages())
-    print("Erros na publicação do Hotspots de CVP ! Tente novamente ...")
+    print("Publicação com erros ! Tente novamente ...")
+    print("Tentando novamente ...")
+    try:
+        arcpy.server.UploadServiceDefinition(inSdFile, inServer, inServiceName,
+                                        inCluster, inFolderType, inFolder,
+                                        inStartup, inOverride, inMyContents,
+                                        inPublic, inOrganization, inGroups)
+        print("Publicação realizada com sucesso !!!")
+    except:
+        print(arcpy.GetMessages())
+        print("Erros na publicação do Hotspots de CVP ! Tente novamente ...")

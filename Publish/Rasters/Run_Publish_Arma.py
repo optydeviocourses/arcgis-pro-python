@@ -52,7 +52,9 @@ m = aprx.listMaps(MyMapName)[0]
 for lyr in m.listLayers('SDE*'):
     if lyr.name == "SDE.RASTER_ARMA_2023":
         lyr.visible = True
-        lyr.transparency = 50
+        lyr.transparency = 60
+        lyr.maxThreshold = 0
+        lyr.minThreshold = 0
 
 # Rasters
 lyrs = []
@@ -62,9 +64,7 @@ print("Preparando à camada raster de Armas para publicação ...")
 
 server_type = "HOSTING_SERVER"
 
-# Create FeatureSharingDraft and set metadata, portal folder, and export data properties
 sddraft = m.getWebLayerSharingDraft(server_type, "TILE", service_name, lyrs)
-
 sddraft.overwriteExistingService = True
 sddraft.summary = "Camada de Raster de Armas - atualizada em: " + dhProcessamento
 sddraft.tags = "Rasters, Influencias, ARMAS2023, "
@@ -114,3 +114,15 @@ try:
 except:
     print(arcpy.GetMessages())
     print("Publicação com erros ! Tente novamente ...")
+
+    os.system("cls")
+    print("Tentando novamente ...")
+    try:
+        arcpy.server.UploadServiceDefinition(inSdFile, inServer, inServiceName,
+                                        inCluster, inFolderType, inFolder,
+                                        inStartup, inOverride, inMyContents,
+                                        inPublic, inOrganization, inGroups)
+        print("Publicação realizada com sucesso !!!")
+    except:
+        print(arcpy.GetMessages())
+        print("Publicação com erros !!! Tente novamente ...")

@@ -21,6 +21,10 @@ MyUserName = os.environ.get("PORTAL_USER")
 MyPassword = os.environ.get("PORTAL_PWD")
 MyProject = os.environ.get("PROJECT_NAME")
 MyMapName = os.environ.get("MAP_NAME")
+MyDataSource = os.environ.get("PROJECT_DATASTORE_SDE")
+MyDataSourceLocal = os.environ.get("PROJECT_DATASTORE_GDB")
+MyTileScheme = os.environ.get("RES_ARCGIS_PRO_TS_CGCS2000_LOCAL")
+MyEscalaView = os.environ.get("ESCALA_VIEW")
 
 data_atual = datetime.now()
 dhProcessamento = data_atual.strftime("%d/%m/%Y %H:%M:%S")
@@ -37,22 +41,23 @@ print("Acesso confirmado !")
 outdir = os.environ.get("PROJECT_FOLDER")
 service_name = "RASTERS_AREAS_CVLI"
 
+if arcpy.Exists(service_name):
+    arcpy.Delete_management(service_name)
+
 sddraft_filename = service_name + ".sddraft"
 sddraft_output_filename = os.path.join(outdir, sddraft_filename)
 
 sd_filename = service_name + ".sd"
 sd_output_filename = os.path.join(outdir, sd_filename)
 
-# Mapa de referência para a publicação
 aprx = arcpy.mp.ArcGISProject(MyProject)
 
-# Mapa de referência
 m = aprx.listMaps(MyMapName)[0]
 
 for lyr in m.listLayers('SDE*'):
     if lyr.name == "SDE.RASTER_CVLI_2023":
         lyr.visible = True
-        lyr.transparency = 50
+        lyr.transparency = 60
 
 # Rasters
 lyrs = []
@@ -62,12 +67,10 @@ print("Preparando à camada raster de CVLI para publicação ...")
 
 server_type = "HOSTING_SERVER"
 
-# Create FeatureSharingDraft and set metadata, portal folder, and export data properties
 sddraft = m.getWebLayerSharingDraft(server_type, "TILE", service_name, lyrs)
-
 sddraft.overwriteExistingService = True
 sddraft.summary = "Camada de Raster de CVLI - atualizada em: " + dhProcessamento
-sddraft.tags = "Rasters, Influencias, CVLI2023 "
+sddraft.tags = "Rasters, Influencias, CVLI2023"
 sddraft.description = "Camada de Raster de CVLI - " + dhProcessamento
 sddraft.credits = "CHEII/SSPAL - Todos os Direitos reservados"
 sddraft.useLimitations = "Ilimitado"
@@ -82,7 +85,6 @@ print("Preparando serviço para publicação ...")
 if arcpy.Exists(sd_output_filename):
     arcpy.Delete_management(sd_output_filename)
 
-# Stage Service para à publicação
 arcpy.server.StageService(sddraft_output_filename, sd_output_filename)
 
 # Variaveis para definir o upload/compartilhamento do serviço
@@ -104,6 +106,7 @@ print("Subindo à definição do serviço ...")
 if arcpy.Exists(inServiceName):
     arcpy.Delete_management(inServiceName)
 
+
 try:
     arcpy.server.UploadServiceDefinition(inSdFile, inServer, inServiceName,
                                         inCluster, inFolderType, inFolder,
@@ -113,3 +116,14 @@ try:
 except:
     print(arcpy.GetMessages())
     print("Publicação com erros ! Tente novamente ...")
+    print("Tentando novamente ...")
+    try:
+        arcpy.server.UploadServiceDefinition(inSdFile, inServer, inServiceName,
+                                        inCluster, inFolderType, inFolder,
+                                        inStartup, inOverride, inMyContents,
+                                        inPublic, inOrganization, inGroups)
+        print("Publicação realizada com sucesso !!!")
+
+    except:
+        print(arcpy.GetMessages())
+        print("Publicação com erros !!! Tente novamente ...")
