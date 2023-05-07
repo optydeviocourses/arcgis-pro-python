@@ -29,10 +29,9 @@ print("Acessando o Portal (arcGIS Online) ...")
 
 try:
     arcpy.SignInToPortal(MyPortal, MyUserName, MyPassword)
+    print("Acesso confirmado !")
 except:
     print("Portal SSPAL (arcGIS Online) indisponível !")
-
-print("Acesso confirmado !")
 
 outdir = os.environ.get("PROJECT_FOLDER")
 service_name = "CAM_ULTIMO_RECURSOS"

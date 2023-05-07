@@ -33,10 +33,9 @@ print("Acessando o Portal ...")
 
 try:
     arcpy.SignInToPortal(MyPortal, MyUserName, MyPassword)
+    print("Acesso confirmado !")
 except:
     print("Portal SSPAL indisponível !")
-
-print("Acesso confirmado !")
 
 outdir = os.environ.get("PROJECT_FOLDER")
 service_name = "RASTERS_AREAS_CVLI"

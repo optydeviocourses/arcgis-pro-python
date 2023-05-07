@@ -29,13 +29,13 @@ print("Acessando o Portal (online) ...")
 
 try:
     arcpy.SignInToPortal(MyPortal, MyUserName, MyPassword)
+    print("Acesso confirmado !")
 except:
     print("Portal SSPAL indisponível !")
 
-print("Acesso confirmado !")
 
 outdir = os.environ.get("PROJECT_FOLDER")
-service_name = "HOTSPOTS_ANALISE_CVP"
+service_name = "HOTSPOTS_CVP"
 
 if arcpy.Exists(service_name):
     arcpy.Delete_management(service_name)
