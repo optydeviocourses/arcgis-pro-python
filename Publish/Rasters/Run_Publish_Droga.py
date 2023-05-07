@@ -68,6 +68,7 @@ server_type = "HOSTING_SERVER"
 sddraft = m.getWebLayerSharingDraft(server_type, "TILE", service_name, lyrs)
 
 sddraft.overwriteExistingService = True
+sddraft.copyDataToServer = True
 sddraft.summary = "Camada de Raster de DROGAS - atualizada em: " + dhProcessamento
 sddraft.tags = "Rasters, Influencias, DROGA2023 "
 sddraft.description = "Camada de Raster de DROGAS - " + dhProcessamento

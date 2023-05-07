@@ -33,6 +33,8 @@ out_in_raster = os.path.join(localDataStore, in_local_raster_name)
 local_mosaic_name = "MOSAIC_ARMA_2023"
 out_local_mosaic = os.path.join(localDataStore, local_mosaic_name)
 
+arcpy.env.outputCoordinateSystem = arcpy.Describe(sdeDataStore).spatialReference
+
 if arcpy.Exists(out_local_mosaic):
     arcpy.Delete_management(out_local_mosaic)
 

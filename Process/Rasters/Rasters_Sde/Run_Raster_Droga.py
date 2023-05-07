@@ -2,57 +2,47 @@
 # Descrição: Converts point features to a raster dataset usando o arcGIS Pro (WM).
 # Observação: execiuta através do arquivo .bat  - /run_rasters.bat
 # Data: 12/04/2023
-# Atualização: 13/04/2023 às 10hs
+# Atualização: 05/05/2023 às 10hs
 # Skills: arcGIS Pro e Python
 # Libs: arcpy, datetime, dotenv
 
 # Import system modules
 import arcpy, os, math
 from arcpy.sa import *
+import xml.dom.minidom as DOM
+from datetime import datetime
+from dotenv import load_dotenv
 
-print("Iniciando Processo de rasteamento de DROGAS em 2023 ...")
-
-# Dir e SDE de trabalho ou DataStore
-sdeDir = r"C:\Users\inteligencia\Desktop\Projetos\assii-sspal\assii-sspal-time-line"
-localDir = r"C:\Users\inteligencia\Desktop\Projetos\assii-sspal"
-
-sde_name_DataStore = r"GEOSSP.sde"
-sdeDataStore = os.path.join(sdeDir, sde_name_DataStore)
+load_dotenv()
 
 # Workspace sempre sera o DataStore do Portal
-arcpy.env.workspace = sdeDataStore
+arcpy.env.workspace = os.environ.get("PROJECT_DATASTORE_SDE")
 
-local_name_DataStore = r"ASSII_SSPAL.gdb"
-localDataStore = os.path.join(localDir, local_name_DataStore)
+print("Iniciando Processo de rasteamento de DROGAS ...")
 
-sde_table_name = "SDE.VW_CAM_NEAC_DROGA_2023"
+# Dir e SDE de trabalho ou DataStore
+sdeDir = os.environ.get("PROJECT_FOLDER")
+localDir = os.environ.get("PATH_ASSII")
+sdeDataStore = os.environ.get("PROJECT_DATASTORE_SDE")
+localDataStore = os.environ.get("PROJECT_DATASTORE_GDB")
+sde_table_name = os.environ.get("VW_CAM_DROGA")
+local_point_table = os.environ.get("POINTS_DROGA")
 
-local_point_table = "POINTS_DROGA_2023"
 out_local_point_table = os.path.join(localDataStore, local_point_table)
 
-print("Stage 1 - Table of Points")
-
-# Apagando tabela de pontos local - ASSII_SSPAL.gdb
 if arcpy.Exists(out_local_point_table):
     arcpy.Delete_management(out_local_point_table)
-
-print("Stage 1 - Table of Points - copiando para GeoDatabase local ...")
 
 # Run CopyFeature de in_name_table to outTable (copiando da VIW de pontos para a DataStore local)
 arcpy.CopyFeatures_management(sde_table_name, out_local_point_table)
 
-print("Stage 2 - Raster Table")
-
-# Parametros do método de conversão de ponto para raster
 valField = "OBJECTID"
 assignmentType = "MOST_FREQUENT"
 priorityField = ""
 cellSize = 0.0038 # 131 pes
 buildRat = "DO_NOT_BUILD"
 
-print("Stage 3 - Raster Table - Processando Raster na DataStore do Portal ...")
-
-sde_raster_name = "SDE.RASTER_DROGA_2023"
+sde_raster_name = os.environ.get("SDE_RASTER_DROGA")
 out_sde_raster = os.path.join(sdeDataStore, sde_raster_name)
 
 # Apagando arquivo de raster no Data Store - SSP.sde
@@ -85,4 +75,4 @@ try:
     print("Processo de Finalizado !!!")
 except:
     print(arcpy.GetMessages())
-    print("Problema no procesamento do raster! Tente novamente ...")
+    print("Problema no procesamento do raster de Drogas ! Tente novamente ...")

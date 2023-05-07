@@ -30,6 +30,8 @@ localDir = os.environ.get("PATH_ASSII")
 cacheDir = os.environ.get("PATH_CACHE")
 
 localDataStore = os.environ.get("DATASTORE_GDB")
+sdeDataStore = os.environ.get("DATASTORE_SDE")
+arcpy.env.outputCoordinateSystem = arcpy.Describe(sdeDataStore).spatialReference
 
 local_raster_name = "RASTER_CVLI_2023"
 out_local_raster = os.path.join(localDataStore, local_raster_name)

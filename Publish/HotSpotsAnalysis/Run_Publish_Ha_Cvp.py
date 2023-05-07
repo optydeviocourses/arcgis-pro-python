@@ -35,7 +35,10 @@ except:
 print("Acesso confirmado !")
 
 outdir = os.environ.get("PROJECT_FOLDER")
-service_name = "HOTSPOT_AREAS_CVP"
+service_name = "HOTSPOTS_ANALISE_CVP"
+
+if arcpy.Exists(service_name):
+    arcpy.Delete_management(service_name)
 
 sddraft_filename = service_name + ".sddraft"
 sddraft_output_filename = os.path.join(outdir, sddraft_filename)
@@ -49,14 +52,14 @@ aprx = arcpy.mp.ArcGISProject(MyProject)
 # Mapa de referência
 m = aprx.listMaps(MyMapName)[0]
 
-for lyr in m.listLayers('HOTSPOT_ANALISE*'):
-    if lyr.name == "HOTSPOT_ANALISE_CVP_2023":
+for lyr in m.listLayers('HOTSPOTS_ANALISE*'):
+    if lyr.name == "HOTSPOTS_ANALISE_CVP_2023":
         lyr.visible = True
         lyr.transparency = 50
 
 # Rasters
 lyrs = []
-lyrs.append(m.listLayers('HOTSPOT_ANALISE_CVP_2023')[0])
+lyrs.append(m.listLayers('HOTSPOTS_ANALISE_CVP_2023')[0])
 
 print("Preparando à camada HotSpot para publicação ...")
 
@@ -65,6 +68,7 @@ server_type = "HOSTING_SERVER"
 sddraft = m.getWebLayerSharingDraft(server_type, "FEATURE", service_name, lyrs)
 
 sddraft.overwriteExistingService = True
+sddraft.copyDataToServer = True
 sddraft.summary = "Camada de Hotspots de CVP - atualizada em: " + dhProcessamento
 sddraft.tags = "Hotspots, Influencias, CVP2023"
 sddraft.description = "Camada de Hotspots de CVP - " + dhProcessamento
@@ -73,7 +77,6 @@ sddraft.useLimitations = "Ilimitado"
 
 print("Criando serviços para publicação ...")
 
-# Create Service Definition Draft file
 sddraft.exportToSDDraft(sddraft_output_filename)
 
 print("Preparando serviços para publicação ...")
@@ -84,7 +87,6 @@ if arcpy.Exists(sd_output_filename):
 # Stage Service para à publicação
 arcpy.server.StageService(sddraft_output_filename, sd_output_filename)
 
-# Variaveis para definir o upload/compartilhamento do serviço
 inSdFile = sd_output_filename
 inServer = "HOSTING_SERVER"
 inServiceName = service_name
@@ -114,14 +116,4 @@ try:
     print("Publicação do Hotspots de CVP realizada com sucesso !!!")
 except:
     print(arcpy.GetMessages())
-    print("Publicação com erros ! Tente novamente ...")
-    print("Tentando novamente ...")
-    try:
-        arcpy.server.UploadServiceDefinition(inSdFile, inServer, inServiceName,
-                                        inCluster, inFolderType, inFolder,
-                                        inStartup, inOverride, inMyContents,
-                                        inPublic, inOrganization, inGroups)
-        print("Publicação realizada com sucesso !!!")
-    except:
-        print(arcpy.GetMessages())
-        print("Erros na publicação do Hotspots de CVP ! Tente novamente ...")
+    print("Erros na publicação do Hotspots de CVPs ! Tente novamente ...")

@@ -46,18 +46,18 @@ if arcpy.Exists(service_name):
 
 sddraft_filename = service_name + ".sddraft"
 sddraft_output_filename = os.path.join(outdir, sddraft_filename)
-
 sd_filename = service_name + ".sd"
 sd_output_filename = os.path.join(outdir, sd_filename)
 
 aprx = arcpy.mp.ArcGISProject(MyProject)
-
 m = aprx.listMaps(MyMapName)[0]
 
 for lyr in m.listLayers('SDE*'):
     if lyr.name == "SDE.RASTER_CVLI_2023":
         lyr.visible = True
         lyr.transparency = 60
+        lyr.maxThreshold = 100
+        lyr.minThreshold = 1000000
 
 # Rasters
 lyrs = []
@@ -69,6 +69,7 @@ server_type = "HOSTING_SERVER"
 
 sddraft = m.getWebLayerSharingDraft(server_type, "TILE", service_name, lyrs)
 sddraft.overwriteExistingService = True
+sddraft.copyDataToServer = True
 sddraft.summary = "Camada de Raster de CVLI - atualizada em: " + dhProcessamento
 sddraft.tags = "Rasters, Influencias, CVLI2023"
 sddraft.description = "Camada de Raster de CVLI - " + dhProcessamento
@@ -105,7 +106,6 @@ print("Subindo à definição do serviço ...")
 
 if arcpy.Exists(inServiceName):
     arcpy.Delete_management(inServiceName)
-
 
 try:
     arcpy.server.UploadServiceDefinition(inSdFile, inServer, inServiceName,

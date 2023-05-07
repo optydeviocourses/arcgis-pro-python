@@ -8,41 +8,31 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-print("Criando Rasters CVLI no Portal  ...")
+arcpy.env.workspace = os.environ.get("PROJECT_FOLDER")
 
+#sprint("Criando Rasters CVLI no Portal  ...")
 MyPortal = os.environ.get("PORTAL_URL")
 MyUserName = os.environ.get("PORTAL_USER")
 MyPassword = os.environ.get("PORTAL_PWD")
 MyProject = os.environ.get("PROJECT_NAME")
-MyMapName = os.environ.get("MAP_NAME")
 MyProjectFolder = os.environ.get("PROJECT_FOLDER")
+
+MyMapName = os.environ.get("MAP_NAME")
 MyDataSource = os.environ.get("PROJECT_DATASTORE_SDE")
 MyDataSourceLocal = os.environ.get("PROJECT_DATASTORE_GDB")
-MyTileSchemeFolder = os.environ.get("RES_ARCGIS_PRO_TS")
+MyTileScheme = os.environ.get("RES_ARCGIS_PRO_TS_CGCS2000_LOCAL")
+MyEscalaView = os.environ.get("ESCALA_VIEW")
+MyMosaicGdbCvli =  os.environ.get("MOSAIC_GDB_CVLI")
+MyRasterGdbCvli =  os.environ.get("RASTER_GDB_CVLI")
 
-data_atual = datetime.now()
-dhProcessamento = data_atual.strftime("%d/%m/%Y %H:%M:%S")
-
-arcpy.env.workspace = os.environ.get("PROJECT_DATASTORE_SDE")
-
-print("Acessando o Portal ...")
-
-try:
-    arcpy.SignInToPortal(MyPortal, MyUserName, MyPassword)
-except:
-    print("Portal SSPAL indisponível !")
-
-print("Acesso confirmado !")
-
-
-mdName = os.path.join(MyDataSource, "RASTER_CVLI_2023")
+mdName = MyRasterGdbCvli
 outScheme =  os.path.join(MyProjectFolder, "TileSchemeCvli.xml")
 method = "NEW"
 numscales = "5"
 predefScheme = "#"
-scales = "16000;8000;4000;1000:500"
+scales = MyEscalaView
 scaleType = "SCALE"
-tileOrigin ="-20037700 30198300"
+tileOrigin ="#"
 dpi = "96"
 tileSize ="256 x 256"
 tileFormat = "MIXED"

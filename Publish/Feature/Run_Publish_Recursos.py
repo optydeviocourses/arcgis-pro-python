@@ -45,7 +45,6 @@ sd_output_filename = os.path.join(outdir, sd_filename)
 
 aprx = arcpy.mp.ArcGISProject(MyProject)
 
-# Mapa de referência
 m = aprx.listMaps(MyMapName)[0]
 
 for lyr in m.listLayers('SDE.TB_CAM_RADIO_DIG*'):
@@ -53,7 +52,6 @@ for lyr in m.listLayers('SDE.TB_CAM_RADIO_DIG*'):
         lyr.visible = True
         lyr.transparency = 50
 
-# Rasters
 lyrs = []
 lyrs.append(m.listLayers('SDE.TB_CAM_RADIO_DIG')[0])
 
@@ -64,6 +62,7 @@ server_type = "HOSTING_SERVER"
 sddraft = m.getWebLayerSharingDraft(server_type, "FEATURE", service_name, lyrs)
 
 sddraft.overwriteExistingService = True
+sddraft.copyDataToServer = True
 sddraft.summary = "Camada última posição dos Recursos - atualizada em: " + dhProcessamento
 sddraft.tags = "CAD, Recursos, Viaturas, Rádios, Postos Fixos, Motos"
 sddraft.description = "Camada última posição dos Recursos - " + dhProcessamento
@@ -72,7 +71,6 @@ sddraft.useLimitations = "Ilimitado"
 
 print("Criando serviço para publicação ...")
 
-# Create Service Definition Draft file
 sddraft.exportToSDDraft(sddraft_output_filename)
 
 print("Preparando serviço para publicação ...")
@@ -83,7 +81,6 @@ if arcpy.Exists(sd_output_filename):
 # Stage Service para à publicação
 arcpy.server.StageService(sddraft_output_filename, sd_output_filename)
 
-# Variaveis para definir o upload/compartilhamento do serviço
 inSdFile = sd_output_filename
 inServer = "HOSTING_SERVER"
 inServiceName = service_name
@@ -113,24 +110,4 @@ try:
     print("Publicação da última posição dos Recursos realizada com sucesso !!!")
 except:
     print(arcpy.GetMessages())
-    print("Publicação com erros ! Tente novamente ...")
-    print("Tentando novamente ...")
-    try:
-        arcpy.server.UploadServiceDefinition(inSdFile, inServer, inServiceName,
-                                        inCluster, inFolderType, inFolder,
-                                        inStartup, inOverride, inMyContents,
-                                        inPublic, inOrganization, inGroups)
-        print("Publicação realizada com sucesso !!!")
-    except:
-        print(arcpy.GetMessages())
-        print("Publicação com erros ! Tente novamente ...")
-        print("Tentando novamente ...")
-        try:
-            arcpy.server.UploadServiceDefinition(inSdFile, inServer, inServiceName,
-                                            inCluster, inFolderType, inFolder,
-                                            inStartup, inOverride, inMyContents,
-                                            inPublic, inOrganization, inGroups)
-            print("Publicação realizada com sucesso !!!")
-        except:
-            print(arcpy.GetMessages())
-            print("Erros na publicação da última posição dos Recursos ! Tente novamente ...")
+    print("Erros na publicação da última posição dos Recursos ! Tente novamente ...")
