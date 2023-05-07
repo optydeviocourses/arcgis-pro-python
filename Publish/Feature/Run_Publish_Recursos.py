@@ -99,9 +99,6 @@ print("Subindo às definições do serviço ...")
 if arcpy.Exists(inServiceName):
     arcpy.Delete_management(inServiceName)
 
-if arcpy.Exists("0123456789ABCDEF"):
-    arcpy.Delete_management("0123456789ABCDEF")
-
 try:
     arcpy.server.UploadServiceDefinition(inSdFile, inServer, inServiceName,
                                         inCluster, inFolderType, inFolder,

@@ -16,7 +16,6 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Workspace sempre sera o DataStore do Portal
-
 arcpy.env.workspace = os.environ.get("PROJECT_DATASTORE_SDE")
 
 print("Iniciando Processo de rasteamento de CVLIs ...")

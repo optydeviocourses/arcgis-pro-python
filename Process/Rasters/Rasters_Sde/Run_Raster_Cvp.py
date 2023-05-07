@@ -54,19 +54,14 @@ try:
                                 out_sde_raster, assignmentType,
                                 priorityField, cellSize, buildRat)
 
-    # Ajuste para cor unica de raster
     sde_vegras = Raster(out_sde_raster)
     sde_vegras.readOnly = False
 
     for r, c in sde_vegras:
-        #print(i, j, vegras[i, j])
         v = sde_vegras[r, c]
-        # Check for NoData
         if math.isnan(v):
-            # Write NoData to outRaster
             sde_vegras[r, c] = math.nan
         else:
-            # Write v to outRaster
             sde_vegras[r, c] = 5
 
     sde_vegras.save()
