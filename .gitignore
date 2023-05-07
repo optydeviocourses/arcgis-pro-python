@@ -1,5 +1,4 @@
 .env
-*.bat
 ./Estudos
 ./Process_Rasters/Rasters_Local
 ./Process_Rasters/Rasters_All

@@ -1,0 +1,1 @@
+python.exe c:/Users/inteligencia/Documents/Projetos/Rasters/Run_Raster_DROGA_2023.py

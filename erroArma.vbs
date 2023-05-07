@@ -1,1 +1,0 @@
-msgbox "Erro na Publicação das Armas", vbcritical, "Erro Faltal"
