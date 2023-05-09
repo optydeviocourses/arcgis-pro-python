@@ -14,7 +14,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-print("Criando Rasters Local de CVLI para o Portal  ...")
+print("Criando Rasters Local de CVLIs para o Portal  ...")
 
 # Workspace sempre sera o DataStore do Portal
 arcpy.env.workspace = os.environ.get("WORKSPACE")
@@ -59,9 +59,6 @@ for lyr in m.listLayers('RASTER*'):
     if lyr.name == "RASTER_CVLI_2023":
         lyr.visible = True
         lyr.transparency = 60
-        lyr.maxThreshold = 500
-        lyr.minThreshold = 1500000
-        lyr.buildCache = True
 
 # Rasters
 lyrs = []

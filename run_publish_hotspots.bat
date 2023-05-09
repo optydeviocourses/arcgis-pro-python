@@ -9,7 +9,7 @@ rem Fim do procedimento.
 set ENDTIME=%TIME%
 set /A DURATION=%ENDTIME%-%STARTTIME%
 
-echo Processo iniciado às %STARTTIME%  finalizado às %ENDTIME%
+echo Processo iniciado às %STARTTIME% finalizado às %ENDTIME%
 echo Processamentos finalizados !
 echo Tempo total de processamento %DURATION% seg.
 @echo on

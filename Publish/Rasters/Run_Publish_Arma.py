@@ -14,7 +14,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-print("Criando Rasters LocaL de Arma para o Portal  ...")
+print("Criando Rasters Local de Arma para o Portal  ...")
 
 # Workspace sempre sera o DataStore do Portal
 arcpy.env.workspace = os.environ.get("WORKSPACE")
