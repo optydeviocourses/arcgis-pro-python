@@ -15,5 +15,3 @@ echo Processo iniciado às %STARTTIME%  finalizado às %ENDTIME%
 echo Processamentos finalizados !
 echo Tempo total de processamento %DURATION% seg.
 @echo on
-
-
