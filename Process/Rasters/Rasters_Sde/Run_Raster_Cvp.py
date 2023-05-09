@@ -16,7 +16,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Workspace sempre sera o DataStore do Portal
-arcpy.env.workspace = os.environ.get("PROJECT_DATASTORE_SDE")
+arcpy.env.workspace = os.environ.get("WORKSPACE")
 
 print("Iniciando Processo de rasteamento de CVPs ...")
 
@@ -39,7 +39,7 @@ valField = "OBJECTID"
 assignmentType = "MOST_FREQUENT"
 priorityField = ""
 cellSize = 0.0038 # 131 pes
-buildRat = "DO_NOT_BUILD"
+buildRat = "BUILD"
 
 sde_raster_name = os.environ.get("SDE_RASTER_CVP")
 out_sde_raster = os.path.join(sdeDataStore, sde_raster_name)

@@ -16,6 +16,9 @@ load_dotenv()
 
 print("Criando Rasters CVLI no Portal  ...")
 
+# Workspace sempre sera o DataStore do Portal
+arcpy.env.workspace = os.environ.get("WORKSPACE")
+
 MyPortal = os.environ.get("PORTAL_URL")
 MyUserName = os.environ.get("PORTAL_USER")
 MyPassword = os.environ.get("PORTAL_PWD")
@@ -55,8 +58,9 @@ for lyr in m.listLayers('SDE*'):
     if lyr.name == "SDE.RASTER_CVLI_2023":
         lyr.visible = True
         lyr.transparency = 60
-        lyr.maxThreshold = 100
-        lyr.minThreshold = 1000000
+        lyr.maxThreshold = 500
+        lyr.minThreshold = 1500000
+        lyr.buildCache = True
 
 # Rasters
 lyrs = []
