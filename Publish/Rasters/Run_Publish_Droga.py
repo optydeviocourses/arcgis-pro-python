@@ -14,7 +14,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-print("Criando Rasters de Drogas no Portal  ...")
+print("Criando Rasters Local de Drogas para o Portal  ...")
+
+# Workspace sempre sera o DataStore do Portal
+arcpy.env.workspace = os.environ.get("WORKSPACE")
+
+#spatial_ref = arcpy.Describe(localDataStore).spatialReference
+arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(os.environ.get("SP_REF"))
 
 MyPortal = os.environ.get("PORTAL_URL")
 MyUserName = os.environ.get("PORTAL_USER")
@@ -49,16 +55,18 @@ aprx = arcpy.mp.ArcGISProject(MyProject)
 # Mapa de referência
 m = aprx.listMaps(MyMapName)[0]
 
-for lyr in m.listLayers('SDE*'):
-    if lyr.name == "SDE.RASTER_DROGA_2023":
+for lyr in m.listLayers('RASTER*'):
+    if lyr.name == "RASTER_DROGA_2023":
         lyr.visible = True
         lyr.transparency = 60
-        lyr.maxThreshold = 0
-        lyr.minThreshold = 0
+        lyr.transparency = 60
+        lyr.maxThreshold = 500
+        lyr.minThreshold = 1500000
+        lyr.buildCache = True
 
 # Rasters
 lyrs = []
-lyrs.append(m.listLayers('SDE.RASTER_DROGA_2023')[0])
+lyrs.append(m.listLayers('RASTER_DROGA_2023')[0])
 
 print("Preparando à camada raster de Drogas para publicação ...")
 
@@ -117,8 +125,7 @@ try:
 except:
     print(arcpy.GetMessages())
     print("Publicação com erros ! Tente novamente ...")
-
-    os.system("cls")
+    #os.system("cls")
     print("Tentando novamente ...")
     try:
         arcpy.server.UploadServiceDefinition(inSdFile, inServer, inServiceName,

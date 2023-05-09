@@ -15,10 +15,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+print("Iniciando Processo de rasteamento de CVPs ...")
+
 # Workspace sempre sera o DataStore do Portal
 arcpy.env.workspace = os.environ.get("WORKSPACE")
 
-print("Iniciando Processo de rasteamento de CVPs ...")
+#spatial_ref = arcpy.Describe(localDataStore).spatialReference
+arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(os.environ.get("SP_REF"))
 
 sdeDir = os.environ.get("PROJECT_FOLDER")
 localDir = os.environ.get("PATH_ASSII")

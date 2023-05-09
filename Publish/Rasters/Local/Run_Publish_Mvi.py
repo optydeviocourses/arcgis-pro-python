@@ -14,7 +14,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-print("Criando Rasters Local de CVLI para o Portal  ...")
+print("Criando Rasters CVLI no Portal  ...")
 
 # Workspace sempre sera o DataStore do Portal
 arcpy.env.workspace = os.environ.get("WORKSPACE")

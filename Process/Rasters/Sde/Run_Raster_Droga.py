@@ -1,4 +1,4 @@
-# Nome: Run_Raster_Arma_2023.py
+# Nome: Run_Raster_Droga_2023.py
 # Descrição: Converts point features to a raster dataset usando o arcGIS Pro (WM).
 # Observação: execiuta através do arquivo .bat  - /run_rasters.bat
 # Data: 12/04/2023
@@ -15,18 +15,21 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Workspace sempre sera o DataStore do Portal
-arcpy.env.workspace = os.environ.get("PROJECT_DATASTORE_SDE")
+print("Iniciando Processo de rasteamento de DROGAS ...")
 
-print("Iniciando Processo de rasteamento de Armas ...")
+# Workspace sempre sera o DataStore do Portal
+arcpy.env.workspace = os.environ.get("WORKSPACE")
+
+#spatial_ref = arcpy.Describe(localDataStore).spatialReference
+arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(os.environ.get("SP_REF"))
 
 # Dir e SDE de trabalho ou DataStore
 sdeDir = os.environ.get("PROJECT_FOLDER")
 localDir = os.environ.get("PATH_ASSII")
 sdeDataStore = os.environ.get("PROJECT_DATASTORE_SDE")
 localDataStore = os.environ.get("PROJECT_DATASTORE_GDB")
-sde_table_name = os.environ.get("VW_CAM_ARMA")
-local_point_table = os.environ.get("POINTS_ARMA")
+sde_table_name = os.environ.get("VW_CAM_DROGA")
+local_point_table = os.environ.get("POINTS_DROGA")
 
 out_local_point_table = os.path.join(localDataStore, local_point_table)
 
@@ -40,9 +43,9 @@ valField = "OBJECTID"
 assignmentType = "MOST_FREQUENT"
 priorityField = ""
 cellSize = 0.0038 # 131 pes
-buildRat = "DO_NOT_BUILD"
+buildRat = "BUILD"
 
-sde_raster_name = os.environ.get("SDE_RASTER_ARMA")
+sde_raster_name = os.environ.get("SDE_RASTER_DROGA")
 out_sde_raster = os.path.join(sdeDataStore, sde_raster_name)
 
 # Apagando arquivo de raster no Data Store - SSP.sde
@@ -70,4 +73,4 @@ try:
     print("Processo de Finalizado !!!")
 except:
     print(arcpy.GetMessages())
-    print("Problema no procesamento do raster de Armas ! Tente novamente ...")
+    print("Problema no procesamento do raster de Drogas ! Tente novamente ...")

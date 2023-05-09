@@ -14,7 +14,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-print("Criando Rasters Local de CVLI para o Portal  ...")
+print("Criando Rasters CVLI no Portal  ...")
 
 # Workspace sempre sera o DataStore do Portal
 arcpy.env.workspace = os.environ.get("WORKSPACE")
@@ -29,6 +29,8 @@ MyProject = os.environ.get("PROJECT_NAME")
 MyMapName = os.environ.get("MAP_NAME")
 MyDataSource = os.environ.get("PROJECT_DATASTORE_SDE")
 MyDataSourceLocal = os.environ.get("PROJECT_DATASTORE_GDB")
+MyTileScheme = os.environ.get("RES_ARCGIS_PRO_TS_CGCS2000_LOCAL")
+MyEscalaView = os.environ.get("ESCALA_VIEW")
 
 data_atual = datetime.now()
 dhProcessamento = data_atual.strftime("%d/%m/%Y %H:%M:%S")
@@ -55,8 +57,8 @@ sd_output_filename = os.path.join(outdir, sd_filename)
 aprx = arcpy.mp.ArcGISProject(MyProject)
 m = aprx.listMaps(MyMapName)[0]
 
-for lyr in m.listLayers('RASTER*'):
-    if lyr.name == "RASTER_CVLI_2023":
+for lyr in m.listLayers('SDE*'):
+    if lyr.name == "SDE.RASTER_CVLI_2023":
         lyr.visible = True
         lyr.transparency = 60
         lyr.maxThreshold = 500
@@ -65,7 +67,7 @@ for lyr in m.listLayers('RASTER*'):
 
 # Rasters
 lyrs = []
-lyrs.append(m.listLayers('RASTER_CVLI_2023')[0])
+lyrs.append(m.listLayers('SDE.RASTER_CVLI_2023')[0])
 
 print("Preparando à camada raster de CVLI para publicação ...")
 
