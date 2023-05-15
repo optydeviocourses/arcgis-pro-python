@@ -17,9 +17,9 @@ load_dotenv()
 print("Criando Rasters Local de CVLIs para o Portal  ...")
 
 # Workspace sempre sera o DataStore do Portal
+arcpy.env.overwriteOutput = True
 arcpy.env.workspace = os.environ.get("WORKSPACE")
 
-#spatial_ref = arcpy.Describe(localDataStore).spatialReference
 arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(os.environ.get("SP_REF"))
 
 MyPortal = os.environ.get("PORTAL_URL")
@@ -69,6 +69,7 @@ print("Preparando à camada raster de CVLI para publicação ...")
 server_type = "HOSTING_SERVER"
 
 sddraft = m.getWebLayerSharingDraft(server_type, "TILE", service_name, lyrs)
+
 sddraft.overwriteExistingService = True
 sddraft.copyDataToServer = True
 sddraft.summary = "Camada de Raster de CVLI - atualizada em: " + dhProcessamento
@@ -76,6 +77,7 @@ sddraft.tags = "Rasters, Influencias, CVLI2023"
 sddraft.description = "Camada de Raster de CVLI - " + dhProcessamento
 sddraft.credits = "CHEII/SSPAL - Todos os Direitos reservados"
 sddraft.useLimitations = "Ilimitado"
+sddraft.copyDataToServer = True
 
 print("Criando serviços para publicação ...")
 
@@ -93,7 +95,8 @@ arcpy.server.StageService(sddraft_output_filename, sd_output_filename)
 inSdFile = sd_output_filename
 inServer = "HOSTING_SERVER"
 inServiceName = service_name
-inCluster = "GEOSSP.sde"
+SinCluster = "GEOSSP.sde"
+inCluster = "#"
 inFolderType = "EXISTING"
 inFolder = "Secretario"
 inStartup = "STARTED"

@@ -17,6 +17,7 @@ load_dotenv()
 print("Criando Rasters Local de Arma para o Portal  ...")
 
 # Workspace sempre sera o DataStore do Portal
+arcpy.env.overwriteOutput = True
 arcpy.env.workspace = os.environ.get("WORKSPACE")
 
 #spatial_ref = arcpy.Describe(localDataStore).spatialReference
