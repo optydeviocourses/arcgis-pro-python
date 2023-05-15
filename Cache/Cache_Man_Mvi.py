@@ -8,9 +8,8 @@
 
 import arcpy
 import os
-from datetime import datetime
+#from datetime import datetime
 from dotenv import load_dotenv
-from arcgis.gis import GIS
 
 load_dotenv()
 
@@ -20,7 +19,7 @@ arcpy.env.overwriteOutput = True
 arcpy.env.workspace = os.environ.get("PROJECT_FOLDER")
 
 MyCachePath = os.environ.get("CACHE_PATH")
-MyProject = os.environ.get("PROJECT_NAME")
+MyProject = os.environ.get("PROJECT_FOLDER")
 MyMapName = os.environ.get("MAP_NAME")
 
 username = os.environ.get("PORTAL_USER")
@@ -28,23 +27,29 @@ password = os.environ.get("PORTAL_PWD")
 
 # Sign in to portal
 myPortal= os.environ.get("PORTAL_URL")
+
 arcpy.SignInToPortal(myPortal, username, password)
-serviceName= "RASTERS_AREA_CVLI"
+
+#arcpy.SignInToPortal(myPortal, '02234632480', '@CRneto04')
+
+serviceName= "RASTERS_AREAS_CVLI"
 serviceType= "MapServer"
 myPortalServiceURL = (myPortal + "/" + "rest/services" +"/" + serviceName + "/" + serviceType)
+
+mytest = os.environ.get("RASTER_GDB_CVLI")
 
 #variables for reporting
 currentTime = datetime.datetime.now()
 arg1 = currentTime.strftime("%H-%M")
 arg2 = currentTime.strftime("%Y-%m-%d %H:%M")
-file = 'C:/data/report_%s.txt' % arg1
+file = MyProject + 'data/report_%s.txt' % arg1
 
 
-# List of input variables for map or image service 
-scales = [500000,250000]
-numOfCachingServiceInstances = 8
+# List of input variables for map or image service
+scales = [50000,25000]
+numOfCachingServiceInstances = 4
 updateMode = "RECREATE_ALL_TILES"
-areaOfInterest = "C:/data/shp/CaTxFlMaMin.shp"
+areaOfInterest = "#"
 waitForJobCompletion = "WAIT"
 updateExtents = ""
 portalURL =""
@@ -53,7 +58,7 @@ portalURL =""
 currentTime = datetime.datetime.now()
 arg1 = currentTime.strftime("%H-%M")
 arg2 = currentTime.strftime("%Y-%m-%d %H:%M")
-file = 'C:/data/report_%s.txt' % arg1
+file = MyProject + 'data/report_%s.txt' % arg1
 
 # Print results of the script to a report
 report = open(file,'w')
@@ -69,13 +74,14 @@ try:
     report.write ("completed " + str(resultValue))
 
     print ("Created cache tiles for given schema successfully for " + serviceName )
-    
+
 except Exception as e:
     # If an error occurred, print line number and error message
     import traceback, sys
     tb = sys.exc_info()[2]
-    report.write("Failed at step 1 \n" "Line %i" % tb.tb_lineno)
-    report.write(e.message)
+    report.write("Failed at step 1 \n" "Line %i" % tb.tb_lineno + "\n")
+    report.write(arcpy.GetMessages())
+    print ("Error update of cache tiles for " + serviceName + " ...")
 report.close()
 
-print ("Completed update of cache tiles for " + serviceName)
+#print ("Completed update of cache tiles for " + serviceName)
