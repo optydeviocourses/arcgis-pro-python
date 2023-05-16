@@ -54,6 +54,7 @@ if arcpy.Exists(out_sde_raster):
 
 try:
     # Run PointToRaster in Portal DataStore
+    # arcpy.conversion.PointToRaster(in_features, value_field, out_rasterdataset, {cell_assignment}, {priority_field}, {cellsize}, {build_rat})
     arcpy.conversion.PointToRaster(out_local_point_table, valField,
                                 out_sde_raster, assignmentType,
                                 priorityField, cellSize, buildRat)
