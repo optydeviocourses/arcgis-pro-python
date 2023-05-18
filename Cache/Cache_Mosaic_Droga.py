@@ -5,22 +5,16 @@ load_dotenv()
 arcpy.env.overwriteOutput = True
 arcpy.env.workspace = os.environ.get("PROJECT_FOLDER")
 
-MyPortal = os.environ.get("PORTAL_URL")
-MyUserName = os.environ.get("PORTAL_USER")
-MyPassword = os.environ.get("PORTAL_PWD")
-MyProject = os.environ.get("PROJECT_NAME")
-MyProjectFolder = os.environ.get("PROJECT_FOLDER")
-
 MyMapName = os.environ.get("MAP_NAME")
 MyDataSource = os.environ.get("PROJECT_DATASTORE_SDE")
 MyDataSourceLocal = os.environ.get("PROJECT_DATASTORE_GDB")
 MyTileScheme = os.environ.get("RES_ARCGIS_PRO_TS_WGS84_GEO_LOCAL")
 MyEscalaView = os.environ.get("ESCALA_VIEW")
-MyMosaic_Gdb_Cvli =  os.environ.get("MOSAIC_GDB_CVLI")
+MyMosaic_Gdb_Droga =  os.environ.get("MOSAIC_GDB_DROGA")
 
 arcpy.env.workspace = os.environ.get("PROJECT_FOLDER")
 
-mdname = MyMosaic_Gdb_Cvli
+mdname = MyMosaic_Gdb_Droga
 query = "#"
 definecache = "DEFINE_CACHE"
 generatecache = "GENERATE_CACHE"

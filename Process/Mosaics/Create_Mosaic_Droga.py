@@ -16,7 +16,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 print("Iniciando criação do Mosaico de Drogas ...")
-arcpy.env.workspace = os.environ.get("WORKSPACE")
+arcpy.env.overwriteOutput = True
+arcpy.env.workspace = os.environ.get("PROJECT_FOLDER")
 
 sdeDir = os.environ.get("PROJECT_FOLDER")
 localDir = os.environ.get("PATH_ASSII")
@@ -33,7 +34,7 @@ out_in_raster = os.path.join(localDataStore, in_local_raster_name)
 local_mosaic_name = "MOSAIC_DROGA_2023"
 out_local_mosaic = os.path.join(localDataStore, local_mosaic_name)
 
-arcpy.env.outputCoordinateSystem = arcpy.Describe(sdeDataStore).spatialReference
+#arcpy.env.outputCoordinateSystem = arcpy.Describe(sdeDataStore).spatialReference
 
 if arcpy.Exists(out_local_mosaic):
     arcpy.Delete_management(out_local_mosaic)
@@ -52,6 +53,7 @@ try:
                                          noband, pixtype, pdef,
                                         wavelength)
     print("Criação do Mosaico de Drogas realizada com sucesso !!!")
+    print(arcpy.GetMessages())
 except:
     print(arcpy.GetMessages())
     print("Erro na criação do Mosaico de Drogas ! Tente novamente ...")
