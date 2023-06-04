@@ -21,7 +21,7 @@ arcpy.env.overwriteOutput = True
 arcpy.env.workspace = os.environ.get("WORKSPACE")
 
 #arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(4326)
-#arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(os.environ.get("SP_REF"))
+arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(os.environ.get("SP_REF"))
 
 MyPortal = os.environ.get("PORTAL_URL")
 MyUserName = os.environ.get("PORTAL_USER")
@@ -56,7 +56,6 @@ sd_output_filename = os.path.join(outdir, sd_filename)
 aprx = arcpy.mp.ArcGISProject(MyProject)
 m = aprx.listMaps(MyMapName)[0]
 
-
 for lyr in m.listLayers('RASTER*'):
     if lyr.name == "RASTER_CVLI_2023":
         lyr.visible = True
@@ -73,10 +72,10 @@ print("Preparando à camada raster de CVLI para publicação ...")
 # sddraft.federatedServerUrl = federated_server_url = "https://MyFederatedServer.domain.com/serverWebadaptor"
 # sddraft = m.getWebLayerSharingDraft(server_type, "MAP_IMAGE", service_name)
 # sddraft.federatedServerUrl = federated_server_url
-
+scale = os.environ.get("ESCALA_VIEW")
 server_type = "HOSTING_SERVER"
 #server_url =  os.environ.get("PORTAL_URL") + "serverWebadaptor"
-federated_server_url = "arcgis-web-adaptor.seds.al.gov.br"
+federated_server_url = "https://arcgis.seguranca.al.gov.br/server"
 sddraft = m.getWebLayerSharingDraft(server_type, "TILE", service_name, lyrs)
 sddraft.federatedServerUrl = federated_server_url
 
@@ -96,7 +95,6 @@ sddraft.exportToSDDraft(sddraft_output_filename)
 
 if arcpy.Exists(sd_output_filename):
     arcpy.Delete_management(sd_output_filename)
-
 
 """Modify the .sddraft to enable caching"""
 # Read the file
@@ -155,7 +153,7 @@ try:
     # For cache, use multiple scales separated by semicolon (;)
     # For example, "591657527.591555;295828763.795777"
     try:
-        arcpy.server.ManageMapServerCacheTiles(federated_server_url + "/" + "rest/services" + "/" + service_name + "/" + "MapServer", "591657527.591555;295828763.795777;1500000.1250", "RECREATE_ALL_TILES")
+        arcpy.server.ManageMapServerCacheTiles(federated_server_url + "/" + "rest/services" + "/" + service_name + "/" + "MapServer", scale, "RECREATE_ALL_TILES")
     except Exception as stage_exception:
         print("Analyzer errors encountered - {}".format(str(stage_exception)))
     except arcpy.ExecuteError:
