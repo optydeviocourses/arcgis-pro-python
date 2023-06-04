@@ -173,7 +173,7 @@ except:
         # For cache, use multiple scales separated by semicolon (;)
         # For example, "591657527.591555;295828763.795777"
         try:
-            arcpy.server.ManageMapServerCacheTiles(federated_server_url + "/" + "rest/services" + "/" + service_name + "/" + "MapServer", "591657527.591555;295828763.795777;1500000.1250", "RECREATE_ALL_TILES")
+            arcpy.server.ManageMapServerCacheTiles(federated_server_url + "/" + "rest/services" + "/" + service_name + "/" + "MapServer", scale, "RECREATE_ALL_TILES")
         except Exception as stage_exception:
             print("Analyzer errors encountered - {}".format(str(stage_exception)))
         except arcpy.ExecuteError:
