@@ -21,7 +21,8 @@ arcpy.env.overwriteOutput = True
 arcpy.env.workspace = os.environ.get("WORKSPACE")
 
 #arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(4326)
-arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(os.environ.get("RES_ARCGIS_PRO_TS_WGS84_GEO_LOCAL"))
+arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(3857)
+#arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(os.environ.get("RES_ARCGIS_PRO_TS_WGS84_GEO_LOCAL"))
 
 MyPortal = os.environ.get("PORTAL_URL")
 MyUserName = os.environ.get("PORTAL_USER")
@@ -96,7 +97,7 @@ sddraft.exportToSDDraft(sddraft_output_filename)
 if arcpy.Exists(sd_output_filename):
     arcpy.Delete_management(sd_output_filename)
 
-"""Modify the .sddraft to enable caching"""
+#"""Modify the .sddraft to enable caching"""
 # Read the file
 doc = DOM.parse(sddraft_output_filename)
 
@@ -146,8 +147,7 @@ try:
     arcpy.server.UploadServiceDefinition(inSdFile, inServer, inServiceName,
                                         inCluster, inFolderType, inFolder,
                                         inStartup, inOverride, inMyContents,
-                                        inPublic, inOrganization, inGroups,
-                                        federated_server_url)
+                                        inPublic, inOrganization, inGroups)
     print("Publicação realizada com sucesso !!!")
     # Manage Map server Cache Tiles
     # For cache, use multiple scales separated by semicolon (;)
@@ -166,8 +166,7 @@ except:
         arcpy.server.UploadServiceDefinition(inSdFile, inServer, inServiceName,
                                         inCluster, inFolderType, inFolder,
                                         inStartup, inOverride, inMyContents,
-                                        inPublic, inOrganization, inGroups,
-                                        federated_server_url)
+                                        inPublic, inOrganization, inGroups)
         print("Publicação realizada com sucesso !!!")
         # Manage Map server Cache Tiles
         # For cache, use multiple scales separated by semicolon (;)
