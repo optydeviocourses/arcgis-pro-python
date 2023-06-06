@@ -21,7 +21,7 @@ arcpy.env.overwriteOutput = True
 arcpy.env.workspace = os.environ.get("WORKSPACE")
 
 #arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(4326)
-arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(os.environ.get("SP_REF"))
+arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(os.environ.get("RES_ARCGIS_PRO_TS_WGS84_GEO_LOCAL"))
 
 MyPortal = os.environ.get("PORTAL_URL")
 MyUserName = os.environ.get("PORTAL_USER")
