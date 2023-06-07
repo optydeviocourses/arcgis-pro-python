@@ -19,9 +19,10 @@ print("Criando Rasters Local de Drogas para o Portal  ...")
 # Workspace sempre sera o DataStore do Portal
 arcpy.env.overwriteOutput = True
 arcpy.env.workspace = os.environ.get("WORKSPACE")
+arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(3857)
 
 #spatial_ref = arcpy.Describe(localDataStore).spatialReference
-arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(os.environ.get("SP_REF"))
+#arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(os.environ.get("SP_REF"))
 
 MyPortal = os.environ.get("PORTAL_URL")
 MyUserName = os.environ.get("PORTAL_USER")
@@ -44,9 +45,12 @@ print("Acesso confirmado !")
 outdir = os.environ.get("PROJECT_FOLDER")
 service_name = "RASTERS_AREAS_DROGAS"
 
+# deletando arquivo de serviço dentro da pasta de projeto
+if arcpy.Exists(service_name):
+    arcpy.Delete_management(service_name)
+
 sddraft_filename = service_name + ".sddraft"
 sddraft_output_filename = os.path.join(outdir, sddraft_filename)
-
 sd_filename = service_name + ".sd"
 sd_output_filename = os.path.join(outdir, sd_filename)
 
@@ -60,24 +64,27 @@ for lyr in m.listLayers('RASTER*'):
     if lyr.name == "RASTER_DROGA_2023":
         lyr.visible = True
         lyr.transparency = 60
-        lyr.transparency = 60
-        lyr.maxThreshold = 500
-        lyr.minThreshold = 1500000
-        lyr.buildCache = True
+        lyr.iscache = True
 
 # Rasters
 lyrs = []
-lyrs.append(m.listLayers('RASTER_DROGA_2023')[0])
+lyrs.append(m.listLayers('RASTER_ARMA_2023')[0])
 
-print("Preparando à camada raster de Drogas para publicação ...")
+print("Preparando à camada raster de Armas para publicação ...")
 
+# configurando a camada de raster
+scales = os.environ.get("ESCALA_VIEW")
 server_type = "HOSTING_SERVER"
+server_url =  os.environ.get("SERVER_URL")
+federated_server_url = os.environ.get("SERVICE_URL")
 
-# Create FeatureSharingDraft and set metadata, portal folder, and export data properties
+# prepatando a camada Tile
 sddraft = m.getWebLayerSharingDraft(server_type, "TILE", service_name, lyrs)
 
+sddraft.federatedServerUrl = federated_server_url
 sddraft.overwriteExistingService = True
 sddraft.copyDataToServer = True
+
 sddraft.summary = "Camada de Raster de DROGAS - atualizada em: " + dhProcessamento
 sddraft.tags = "Rasters, Influencias, DROGA2023 "
 sddraft.description = "Camada de Raster de DROGAS - " + dhProcessamento
@@ -105,9 +112,9 @@ for propSet in propSets:
     for keyValue in keyValues:
         if keyValue.tagName == 'Key':
             if keyValue.firstChild.data == "maxRecordCount":
-                keyValue.nextSibling.firstChild.data = "200000"
+                keyValue.nextSibling.firstChild.data = "10000"
             if keyValue.firstChild.data == "cacheOnDemand":
-                keyValue.nextSibling.firstChild.data = "true"
+                keyValue.nextSibling.firstChild.data = "fale"
             if keyValue.firstChild.data == "minScale":
                 keyValue.nextSibling.firstChild.data = "2311162.2171550002"
             if keyValue.firstChild.data == "maxScale":
@@ -123,14 +130,13 @@ doc.writexml(f)
 f.close()
 
 print("Preparando serviço para publicação ...")
-# Stage Service para à publicação
 arcpy.server.StageService(sddraft_output_filename, sd_output_filename)
 
 # Variaveis para definir o upload/compartilhamento do serviço
 inSdFile = sd_output_filename
 inServer = "HOSTING_SERVER"
 inServiceName = service_name
-inCluster = "GEOSSP.sde"
+inCluster = "#"
 inFolderType = "EXISTING"
 inFolder = "Secretario"
 inStartup = "STARTED"
@@ -138,13 +144,12 @@ inOverride = "OVERRIDE_DEFINITION"
 inMyContents = "SHARE_ONLINE"
 inPublic = "PUBLIC"
 inOrganization = "SHARE_ORGANIZATION"
-inGroups = [r"CHEII/SSPAL", "ABIN", "BMAL", r"PC/AL", "PF", r"PM2/PMAL", r"PP/AL", "Visualizadores"]
-
-print("Subindo à definição do serviço ...")
+inGroups = [r"CHEII/SSPAL", "ABIN", "BMAL", r"PC/AL", "PF", r"PM2/PMAL", r"PP/AL"]
 
 if arcpy.Exists(inServiceName):
     arcpy.Delete_management(inServiceName)
 
+print("Subindo à definição do serviço ...")
 try:
      # Compatilhando para o portal
     arcpy.server.UploadServiceDefinition(inSdFile, inServer, inServiceName,

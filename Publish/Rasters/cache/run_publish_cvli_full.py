@@ -139,7 +139,6 @@ arcpy.server.StageService(sddraft_mod_xml_file, sd_output_filename)
 inSdFile = sd_output_filename
 inServer = "HOSTING_SERVER"
 inServiceName = service_name
-SinCluster = "GEOSSP.sde"
 inCluster = "#"
 inFolderType = "EXISTING"
 inFolder = "Secretario"

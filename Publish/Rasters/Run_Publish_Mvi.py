@@ -19,9 +19,10 @@ print("Criando Rasters Local de CVLIs para o Portal  ...")
 # Workspace sempre sera o DataStore do Portal
 arcpy.env.overwriteOutput = True
 arcpy.env.workspace = os.environ.get("WORKSPACE")
+arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(3857)
 
-arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(os.environ.get("SP_REF"))
-
+#arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(4326)
+#arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(os.environ.get("RES_ARCGIS_PRO_TS_WGS84_GEO_LOCAL"))
 MyPortal = os.environ.get("PORTAL_URL")
 MyUserName = os.environ.get("PORTAL_USER")
 MyPassword = os.environ.get("PORTAL_PWD")
@@ -33,32 +34,40 @@ MyDataSourceLocal = os.environ.get("PROJECT_DATASTORE_GDB")
 data_atual = datetime.now()
 dhProcessamento = data_atual.strftime("%d/%m/%Y %H:%M:%S")
 
+# acessando o server e o portal
 print("Acessando o Portal ...")
-
 try:
     arcpy.SignInToPortal(MyPortal, MyUserName, MyPassword)
     print("Acesso confirmado !")
 except:
     print("Portal SSPAL indisponível !")
 
+# pegando dados da pasta do projeto
 outdir = os.environ.get("PROJECT_FOLDER")
 service_name = "RASTERS_AREAS_CVLI"
 
+# deletando arquivo de serviço dentro da pasta de projeto
 if arcpy.Exists(service_name):
     arcpy.Delete_management(service_name)
 
+# preparando o ssddraft do serviço
 sddraft_filename = service_name + ".sddraft"
 sddraft_output_filename = os.path.join(outdir, sddraft_filename)
 sd_filename = service_name + ".sd"
 sd_output_filename = os.path.join(outdir, sd_filename)
 
+# arquivo do projeto
 aprx = arcpy.mp.ArcGISProject(MyProject)
+
+# mapa do projeto com todas as camadas
 m = aprx.listMaps(MyMapName)[0]
 
+# buscar apenas a de cvli em 2023
 for lyr in m.listLayers('RASTER*'):
     if lyr.name == "RASTER_CVLI_2023":
         lyr.visible = True
         lyr.transparency = 60
+        lyr.iscache = True
 
 # Rasters
 lyrs = []
@@ -66,18 +75,25 @@ lyrs.append(m.listLayers('RASTER_CVLI_2023')[0])
 
 print("Preparando à camada raster de CVLI para publicação ...")
 
+# configurando a camada de raster
+scales = os.environ.get("ESCALA_VIEW")
 server_type = "HOSTING_SERVER"
+server_url =  os.environ.get("SERVER_URL")
+federated_server_url = os.environ.get("SERVICE_URL")
 
+# prepatando a camada Tile
 sddraft = m.getWebLayerSharingDraft(server_type, "TILE", service_name, lyrs)
 
+sddraft.federatedServerUrl = federated_server_url
 sddraft.overwriteExistingService = True
 sddraft.copyDataToServer = True
+
+# iunformações do camada para o publico alvo
 sddraft.summary = "Camada de Raster de CVLI - atualizada em: " + dhProcessamento
 sddraft.tags = "Rasters, Influencias, CVLI2023"
 sddraft.description = "Camada de Raster de CVLI - " + dhProcessamento
 sddraft.credits = "CHEII/SSPAL - Todos os Direitos reservados"
 sddraft.useLimitations = "Ilimitado"
-sddraft.copyDataToServer = True
 
 print("Criando serviços para publicação ...")
 
@@ -94,7 +110,6 @@ configProps = doc.getElementsByTagName('ConfigurationProperties')[0]
 propArray = configProps.firstChild
 propSets = propArray.childNodes
 
-# configuracados as proprieddes
 for propSet in propSets:
     keyValues = propSet.childNodes
     for keyValue in keyValues:
@@ -118,8 +133,7 @@ doc.writexml(f)
 f.close()
 
 print("Preparando serviço para publicação ...")
-
-arcpy.server.StageService(sddraft_output_filename, sd_output_filename)
+arcpy.server.StageService(sddraft_mod_xml_file, sd_output_filename)
 
 # Variaveis para definir o upload/compartilhamento do serviço
 inSdFile = sd_output_filename
@@ -134,7 +148,7 @@ inOverride = "OVERRIDE_DEFINITION"
 inMyContents = "SHARE_ONLINE"
 inPublic = "PUBLIC"
 inOrganization = "SHARE_ORGANIZATION"
-inGroups = [r"CHEII/SSPAL", "ABIN", "BMAL", r"PC/AL", "PF", r"PM2/PMAL", r"PP/AL", "Visualizadores"]
+inGroups = [r"CHEII/SSPAL", "ABIN", "BMAL", r"PC/AL", "PF", r"PM2/PMAL", r"PP/AL"]
 
 if arcpy.Exists(inServiceName):
     arcpy.Delete_management(inServiceName)
@@ -146,6 +160,15 @@ try:
                                         inStartup, inOverride, inMyContents,
                                         inPublic, inOrganization, inGroups)
     print("Publicação realizada com sucesso !!!")
+    # Manage Map server Cache Tiles
+    # For cache, use multiple scales separated by semicolon (;)
+    # For example, "591657527.591555;295828763.795777"
+    # try:
+    #     arcpy.server.ManageMapServerCacheTiles(federated_server_url + "/" + "rest/services" + "/" + service_name + "/" + "MapServer", scale, "RECREATE_ALL_TILES")
+    # except Exception as stage_exception:
+    #     print("Analyzer errors encountered - {}".format(str(stage_exception)))
+    # except arcpy.ExecuteError:
+    #     print(arcpy.GetMessages(2))
 except:
     print(arcpy.GetMessages())
     print("Publicação com erros ! Tente novamente ...")
@@ -156,6 +179,15 @@ except:
                                         inStartup, inOverride, inMyContents,
                                         inPublic, inOrganization, inGroups)
         print("Publicação realizada com sucesso !!!")
+        # Manage Map server Cache Tiles
+        # For cache, use multiple scales separated by semicolon (;)
+        # For example, "591657527.591555;295828763.795777"
+        # try:
+        #     arcpy.server.ManageMapServerCacheTiles(federated_server_url + "/" + "rest/services" + "/" + service_name + "/" + "MapServer", scale, "RECREATE_ALL_TILES")
+        # except Exception as stage_exception:
+        #     print("Analyzer errors encountered - {}".format(str(stage_exception)))
+        # except arcpy.ExecuteError:
+        #     print(arcpy.GetMessages(2))
 
     except:
         print(arcpy.GetMessages())
