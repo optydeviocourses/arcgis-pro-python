@@ -87,11 +87,40 @@ print("Criando serviços para publicação ...")
 # Create Service Definition Draft file
 sddraft.exportToSDDraft(sddraft_output_filename)
 
-print("Preparando serviços para publicação ...")
-
 if arcpy.Exists(sd_output_filename):
     arcpy.Delete_management(sd_output_filename)
 
+#"""Modify the .sddraft to enable caching"""
+# Read the file
+doc = DOM.parse(sddraft_output_filename)
+configProps = doc.getElementsByTagName('ConfigurationProperties')[0]
+propArray = configProps.firstChild
+propSets = propArray.childNodes
+
+# configuracados as proprieddes
+for propSet in propSets:
+    keyValues = propSet.childNodes
+    for keyValue in keyValues:
+        if keyValue.tagName == 'Key':
+            if keyValue.firstChild.data == "maxRecordCount":
+                keyValue.nextSibling.firstChild.data = "200000"
+            if keyValue.firstChild.data == "cacheOnDemand":
+                keyValue.nextSibling.firstChild.data = "true"
+            if keyValue.firstChild.data == "minScale":
+                keyValue.nextSibling.firstChild.data = "2311162.2171550002"
+            if keyValue.firstChild.data == "maxScale":
+                keyValue.nextSibling.firstChild.data = "9027.9774109999998"
+            if keyValue.firstChild.data == "isCached":
+                keyValue.nextSibling.firstChild.data = "true"
+
+# Write to a new .sddraft file
+sddraft_mod_xml = service_name + '_mod_xml' + '.sddraft'
+sddraft_mod_xml_file = os.path.join(outdir, sddraft_mod_xml)
+f = open(sddraft_mod_xml_file, 'w')
+doc.writexml(f)
+f.close()
+
+print("Preparando serviço para publicação ...")
 # Stage Service para à publicação
 arcpy.server.StageService(sddraft_output_filename, sd_output_filename)
 
@@ -109,11 +138,10 @@ inPublic = "PUBLIC"
 inOrganization = "SHARE_ORGANIZATION"
 inGroups = [r"CHEII/SSPAL", "ABIN", "BMAL", r"PC/AL", "PF", r"PM2/PMAL", r"PP/AL", "Visualizadores"]
 
-print("Subindo às definições do serviço ...")
-
 if arcpy.Exists(inServiceName):
     arcpy.Delete_management(inServiceName)
 
+print("Subindo às definições do serviço ...")
 try:
      # Compatilhando para o portal
     arcpy.server.UploadServiceDefinition(inSdFile, inServer, inServiceName,
