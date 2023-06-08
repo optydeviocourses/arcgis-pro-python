@@ -14,21 +14,20 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-print("Criando Rasters Local de Drogas para o Portal  ...")
+print("Criando Rasters Local de CVLIs para o Portal  ...")
 
 # Workspace sempre sera o DataStore do Portal
 arcpy.env.overwriteOutput = True
 arcpy.env.workspace = os.environ.get("WORKSPACE")
 #arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(3857)
 
-#spatial_ref = arcpy.Describe(localDataStore).spatialReference
-#arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(os.environ.get("SP_REF"))
-
 MyPortal = os.environ.get("PORTAL_URL")
 MyUserName = os.environ.get("PORTAL_USER")
 MyPassword = os.environ.get("PORTAL_PWD")
 MyProject = os.environ.get("PROJECT_NAME")
 MyMapName = os.environ.get("MAP_NAME")
+MyDataSource = os.environ.get("PROJECT_DATASTORE_SDE")
+MyDataSourceLocal = os.environ.get("PROJECT_DATASTORE_GDB")
 
 data_atual = datetime.now()
 dhProcessamento = data_atual.strftime("%d/%m/%Y %H:%M:%S")
@@ -41,35 +40,38 @@ try:
 except:
     print("Portal SSPAL indisponível !")
 
+# pegando dados da pasta do projeto
 outdir = os.environ.get("PROJECT_FOLDER")
-service_name = "RASTERS_AREAS_DROGAS"
+service_name = "RASTERS_AREAS_CVLI"
 
 # deletando arquivo de serviço dentro da pasta de projeto
 if arcpy.Exists(service_name):
     arcpy.Delete_management(service_name)
 
+# preparando o ssddraft do serviço
 sddraft_filename = service_name + ".sddraft"
 sddraft_output_filename = os.path.join(outdir, sddraft_filename)
 sd_filename = service_name + ".sd"
 sd_output_filename = os.path.join(outdir, sd_filename)
 
-# Mapa de referência para a publicação
+# arquivo do projeto
 aprx = arcpy.mp.ArcGISProject(MyProject)
 
-# Mapa de referência
+# mapa do projeto com todas as camadas
 m = aprx.listMaps(MyMapName)[0]
 
+# buscar apenas a de cvli em 2023
 for lyr in m.listLayers('RASTER*'):
-    if lyr.name == "RASTER_DROGA_2023":
+    if lyr.name == "RASTER_CVLI_2023":
         lyr.visible = True
         lyr.iscache = True
         lyr.transparency = 60
 
 # Rasters
 lyrs = []
-lyrs.append(m.listLayers('RASTER_ARMA_2023')[0])
+lyrs.append(m.listLayers('RASTER_CVLI_2023')[0])
 
-print("Preparando à camada raster de Armas para publicação ...")
+print("Preparando à camada raster de CVLI para publicação ...")
 
 # configurando a camada de raster
 scales = os.environ.get("ESCALA_HASTERS")
@@ -80,27 +82,41 @@ federated_server_url = os.environ.get("SERVICE_URL")
 # prepatando a camada Tile
 sddraft = m.getWebLayerSharingDraft(server_type, "TILE", service_name, lyrs)
 
+# Servidor federado
 sddraft.federatedServerUrl = federated_server_url
 sddraft.overwriteExistingService = True
 sddraft.copyDataToServer = True
 
-sddraft.summary = "Camada de Raster de DROGAS - atualizada em: " + dhProcessamento
-sddraft.tags = "Rasters, Influencias, DROGA2023 "
-sddraft.description = "Camada de Raster de DROGAS - " + dhProcessamento
+# iunformações do camada para o publico alvo
+sddraft.summary = "Camada de Raster de CVLI - atualizada em: " + dhProcessamento
+sddraft.tags = "Rasters, Influencias, CVLI2023"
+sddraft.description = "Camada de Raster de CVLI - " + dhProcessamento
 sddraft.credits = "CHEII/SSPAL - Todos os Direitos reservados"
 sddraft.useLimitations = "Ilimitado"
 
 print("Criando serviços para publicação ...")
-# apagando sd file antigo
-# if arcpy.Exists(sd_output_filename):
-#     arcpy.Delete_management(sd_output_filename)
 
 # Create Service Definition Draft file
 sddraft.exportToSDDraft(sddraft_output_filename)
 
+# if arcpy.Exists(sd_output_filename):
+#     arcpy.Delete_management(sd_output_filename)
+
 #"""Modify the .sddraft to enable caching"""
 # Read the file
 doc = DOM.parse(sddraft_output_filename)
+#Ajutes da ConfigurationProperties
+# configProps = doc.getElementsByTagName('SVCManifest')[0]
+# propArray = configProps.firstChild
+# propSets = propArray.childNodes
+
+# for propSet in propSets:
+#     keyValues = propSet.childNodes
+#     for keyValue in keyValues:
+#         if keyValue.tagName == 'Key':
+#             if keyValue.firstChild.data == "maxRecordCount":
+#                 keyValue.nextSibling.firstChild.data = "20000"
+
 # Ajutes da ConfigurationProperties
 configProps = doc.getElementsByTagName('ConfigurationProperties')[0]
 propArray = configProps.firstChild
@@ -152,12 +168,13 @@ doc.writexml(f)
 f.close()
 
 print("Preparando serviço para publicação ...")
-arcpy.server.StageService(sddraft_output_filename, sd_output_filename)
+arcpy.server.StageService(sddraft_mod_xml_file, sd_output_filename)
 
 # Variaveis para definir o upload/compartilhamento do serviço
 inSdFile = sd_output_filename
 inServer = "HOSTING_SERVER"
 inServiceName = service_name
+SinCluster = "GEOSSP.sde"
 inCluster = "#"
 inFolderType = "EXISTING"
 inFolder = "Secretario"
@@ -173,7 +190,6 @@ if arcpy.Exists(inServiceName):
 
 print("Subindo à definição do serviço ...")
 try:
-     # Compatilhando para o portal
     arcpy.server.UploadServiceDefinition(inSdFile, inServer, inServiceName,
                                         inCluster, inFolderType, inFolder,
                                         inStartup, inOverride, inMyContents,
@@ -182,7 +198,6 @@ try:
 except:
     print(arcpy.GetMessages())
     print("Publicação com erros ! Tente novamente ...")
-    #os.system("cls")
     print("Tentando novamente ...")
     try:
         arcpy.server.UploadServiceDefinition(inSdFile, inServer, inServiceName,

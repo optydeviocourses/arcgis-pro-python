@@ -19,10 +19,11 @@ print("Criando Rasters Local de CVLIs para o Portal  ...")
 # Workspace sempre sera o DataStore do Portal
 arcpy.env.overwriteOutput = True
 arcpy.env.workspace = os.environ.get("WORKSPACE")
-arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(3857)
 
+#arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(3857)
 #arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(4326)
 #arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(os.environ.get("RES_ARCGIS_PRO_TS_WGS84_GEO_LOCAL"))
+
 MyPortal = os.environ.get("PORTAL_URL")
 MyUserName = os.environ.get("PORTAL_USER")
 MyPassword = os.environ.get("PORTAL_PWD")
@@ -66,8 +67,8 @@ m = aprx.listMaps(MyMapName)[0]
 for lyr in m.listLayers('RASTER*'):
     if lyr.name == "RASTER_CVLI_2023":
         lyr.visible = True
-        lyr.transparency = 60
         lyr.iscache = True
+        lyr.transparency = 60
 
 # Rasters
 lyrs = []
@@ -76,7 +77,7 @@ lyrs.append(m.listLayers('RASTER_CVLI_2023')[0])
 print("Preparando à camada raster de CVLI para publicação ...")
 
 # configurando a camada de raster
-scales = os.environ.get("ESCALA_VIEW")
+scales = os.environ.get("ESCALA_HASTERS")
 server_type = "HOSTING_SERVER"
 server_url =  os.environ.get("SERVER_URL")
 federated_server_url = os.environ.get("SERVICE_URL")
@@ -84,6 +85,7 @@ federated_server_url = os.environ.get("SERVICE_URL")
 # prepatando a camada Tile
 sddraft = m.getWebLayerSharingDraft(server_type, "TILE", service_name, lyrs)
 
+# Servidor federado
 sddraft.federatedServerUrl = federated_server_url
 sddraft.overwriteExistingService = True
 sddraft.copyDataToServer = True
@@ -96,16 +98,17 @@ sddraft.credits = "CHEII/SSPAL - Todos os Direitos reservados"
 sddraft.useLimitations = "Ilimitado"
 
 print("Criando serviços para publicação ...")
+# if arcpy.Exists(sd_output_filename):
+#     arcpy.Delete_management(sd_output_filename)
 
 # Create Service Definition Draft file
 sddraft.exportToSDDraft(sddraft_output_filename)
 
-if arcpy.Exists(sd_output_filename):
-    arcpy.Delete_management(sd_output_filename)
-
 #"""Modify the .sddraft to enable caching"""
 # Read the file
 doc = DOM.parse(sddraft_output_filename)
+
+# Ajutes da ConfigurationProperties
 configProps = doc.getElementsByTagName('ConfigurationProperties')[0]
 propArray = configProps.firstChild
 propSets = propArray.childNodes
@@ -115,19 +118,42 @@ for propSet in propSets:
     for keyValue in keyValues:
         if keyValue.tagName == 'Key':
             if keyValue.firstChild.data == "maxRecordCount":
-                keyValue.nextSibling.firstChild.data = "200000"
+                keyValue.nextSibling.firstChild.data = "20000"
             if keyValue.firstChild.data == "cacheOnDemand":
                 keyValue.nextSibling.firstChild.data = "true"
             if keyValue.firstChild.data == "minScale":
-                keyValue.nextSibling.firstChild.data = "2311162.2171550002"
+                keyValue.nextSibling.firstChild.data = "577790.55428899999"
             if keyValue.firstChild.data == "maxScale":
                 keyValue.nextSibling.firstChild.data = "9027.9774109999998"
+            if keyValue.firstChild.data == "clientCachingAllowed":
+                keyValue.nextSibling.firstChild.data = "false"
             if keyValue.firstChild.data == "isCached":
+                keyValue.nextSibling.firstChild.data = "true"
+            if keyValue.firstChild.data == "ignoreCache":
+                keyValue.nextSibling.firstChild.data = "true"
+
+# Ajutes da StagingSettings
+stagSettings = doc.getElementsByTagName('StagingSettings')[0]
+propSetArray = stagSettings.firstChild
+propSetProperties = propSetArray.childNodes
+
+for propSetProperty in propSetProperties:
+    keyValues = propSetProperty.childNodes
+    for keyValue in keyValues:
+        if keyValue.tagName == 'Key':
+            if keyValue.firstChild.data == "useMapServiceLayerID":
+                keyValue.nextSibling.firstChild.data = "true"
+            if keyValue.firstChild.data == "IsHostedServer":
+                keyValue.nextSibling.firstChild.data = "true"
+            if keyValue.firstChild.data == "HasMosaic":
+                keyValue.nextSibling.firstChild.data = "true"
+            if keyValue.firstChild.data == "HasBDAW":
                 keyValue.nextSibling.firstChild.data = "true"
 
 # Write to a new .sddraft file
 sddraft_mod_xml = service_name + '_mod_xml' + '.sddraft'
 sddraft_mod_xml_file = os.path.join(outdir, sddraft_mod_xml)
+
 f = open(sddraft_mod_xml_file, 'w')
 doc.writexml(f)
 f.close()
@@ -160,15 +186,6 @@ try:
                                         inStartup, inOverride, inMyContents,
                                         inPublic, inOrganization, inGroups)
     print("Publicação realizada com sucesso !!!")
-    # Manage Map server Cache Tiles
-    # For cache, use multiple scales separated by semicolon (;)
-    # For example, "591657527.591555;295828763.795777"
-    # try:
-    #     arcpy.server.ManageMapServerCacheTiles(federated_server_url + "/" + "rest/services" + "/" + service_name + "/" + "MapServer", scale, "RECREATE_ALL_TILES")
-    # except Exception as stage_exception:
-    #     print("Analyzer errors encountered - {}".format(str(stage_exception)))
-    # except arcpy.ExecuteError:
-    #     print(arcpy.GetMessages(2))
 except:
     print(arcpy.GetMessages())
     print("Publicação com erros ! Tente novamente ...")
@@ -179,16 +196,6 @@ except:
                                         inStartup, inOverride, inMyContents,
                                         inPublic, inOrganization, inGroups)
         print("Publicação realizada com sucesso !!!")
-        # Manage Map server Cache Tiles
-        # For cache, use multiple scales separated by semicolon (;)
-        # For example, "591657527.591555;295828763.795777"
-        # try:
-        #     arcpy.server.ManageMapServerCacheTiles(federated_server_url + "/" + "rest/services" + "/" + service_name + "/" + "MapServer", scale, "RECREATE_ALL_TILES")
-        # except Exception as stage_exception:
-        #     print("Analyzer errors encountered - {}".format(str(stage_exception)))
-        # except arcpy.ExecuteError:
-        #     print(arcpy.GetMessages(2))
-
     except:
         print(arcpy.GetMessages())
         print("Publicação com erros !!! Tente novamente ...")

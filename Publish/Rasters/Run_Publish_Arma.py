@@ -19,8 +19,8 @@ print("Criando Rasters Local de Arma para o Portal  ...")
 # Workspace sempre sera o DataStore do Portal
 arcpy.env.overwriteOutput = True
 arcpy.env.workspace = os.environ.get("WORKSPACE")
-arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(3857)
 
+#arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(3857)
 #spatial_ref = arcpy.Describe(localDataStore).spatialReference
 #arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(os.environ.get("SP_REF"))
 
@@ -34,7 +34,6 @@ data_atual = datetime.now()
 dhProcessamento = data_atual.strftime("%d/%m/%Y %H:%M:%S")
 
 print("Acessando o Portal ...")
-
 try:
     arcpy.SignInToPortal(MyPortal, MyUserName, MyPassword)
     print("Acesso confirmado !")
@@ -62,8 +61,8 @@ m = aprx.listMaps(MyMapName)[0]
 for lyr in m.listLayers('RASTER*'):
     if lyr.name == "RASTER_ARMA_2023":
         lyr.visible = True
-        lyr.transparency = 60
         lyr.iscache = True
+        lyr.transparency = 60
 
 # Rasters
 lyrs = []
@@ -72,7 +71,7 @@ lyrs.append(m.listLayers('RASTER_ARMA_2023')[0])
 print("Preparando à camada raster de Armas para publicação ...")
 
 # configurando a camada de raster
-scales = os.environ.get("ESCALA_VIEW")
+scales = os.environ.get("ESCALA_HASTERS")
 server_type = "HOSTING_SERVER"
 server_url =  os.environ.get("SERVER_URL")
 federated_server_url = os.environ.get("SERVICE_URL")
@@ -95,30 +94,53 @@ print("Criando serviços para publicação ...")
 # Create Service Definition Draft file
 sddraft.exportToSDDraft(sddraft_output_filename)
 
-if arcpy.Exists(sd_output_filename):
-    arcpy.Delete_management(sd_output_filename)
+# if arcpy.Exists(sd_output_filename):
+#     arcpy.Delete_management(sd_output_filename)
 
 #"""Modify the .sddraft to enable caching"""
 # Read the file
 doc = DOM.parse(sddraft_output_filename)
+
+# Ajutes da ConfigurationProperties
 configProps = doc.getElementsByTagName('ConfigurationProperties')[0]
 propArray = configProps.firstChild
 propSets = propArray.childNodes
 
-# configuracados as proprieddes
 for propSet in propSets:
     keyValues = propSet.childNodes
     for keyValue in keyValues:
         if keyValue.tagName == 'Key':
             if keyValue.firstChild.data == "maxRecordCount":
-                keyValue.nextSibling.firstChild.data = "200000"
+                keyValue.nextSibling.firstChild.data = "20000"
             if keyValue.firstChild.data == "cacheOnDemand":
                 keyValue.nextSibling.firstChild.data = "true"
             if keyValue.firstChild.data == "minScale":
-                keyValue.nextSibling.firstChild.data = "2311162.2171550002"
+                keyValue.nextSibling.firstChild.data = "577790.55428899999"
             if keyValue.firstChild.data == "maxScale":
                 keyValue.nextSibling.firstChild.data = "9027.9774109999998"
+            if keyValue.firstChild.data == "clientCachingAllowed":
+                keyValue.nextSibling.firstChild.data = "false"
             if keyValue.firstChild.data == "isCached":
+                keyValue.nextSibling.firstChild.data = "true"
+            if keyValue.firstChild.data == "ignoreCache":
+                keyValue.nextSibling.firstChild.data = "true"
+
+# Ajutes da StagingSettings
+stagSettings = doc.getElementsByTagName('StagingSettings')[0]
+propSetArray = stagSettings.firstChild
+propSetProperties = propSetArray.childNodes
+
+for propSetProperty in propSetProperties:
+    keyValues = propSetProperty.childNodes
+    for keyValue in keyValues:
+        if keyValue.tagName == 'Key':
+            if keyValue.firstChild.data == "useMapServiceLayerID":
+                keyValue.nextSibling.firstChild.data = "true"
+            if keyValue.firstChild.data == "IsHostedServer":
+                keyValue.nextSibling.firstChild.data = "true"
+            if keyValue.firstChild.data == "HasMosaic":
+                keyValue.nextSibling.firstChild.data = "true"
+            if keyValue.firstChild.data == "HasBDAW":
                 keyValue.nextSibling.firstChild.data = "true"
 
 # Write to a new .sddraft file

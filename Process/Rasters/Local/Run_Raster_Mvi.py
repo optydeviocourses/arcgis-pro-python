@@ -52,14 +52,12 @@ try:
 
     sde_vegras = Raster(local_out_raster)
     sde_vegras.readOnly = False
-
     for r, c in sde_vegras:
         v = sde_vegras[r, c]
         if math.isnan(v):
             sde_vegras[r, c] = math.nan
         else:
             sde_vegras[r, c] = 5
-
     sde_vegras.save()
 
     print("Processo de Finalizado !!!")
