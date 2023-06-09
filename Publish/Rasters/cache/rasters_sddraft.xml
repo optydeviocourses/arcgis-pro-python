@@ -264,10 +264,12 @@
 		<Info xsi:type="typens:PropertySet">
 			<PropertyArray xsi:type="typens:ArrayOfPropertySetProperty">
 			<PropertySetProperty xsi:type="typens:PropertySetProperty">
-				<Key>WebCapabilities</Key><Value xsi:type="xs:string">Map</Value>
+				<Key>WebCapabilities</Key>
+				<Value xsi:type="xs:string">Map</Value>
 			</PropertySetProperty>
 			<PropertySetProperty xsi:type="typens:PropertySetProperty">
-				<Key>WebEnabled</Key><Value xsi:type="xs:string">true</Value>
+				<Key>WebEnabled</Key
+				><Value xsi:type="xs:string">true</Value>
 			</PropertySetProperty>
 			</PropertyArray>
 		</Info>

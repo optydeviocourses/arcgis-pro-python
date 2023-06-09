@@ -19,10 +19,10 @@ print("Criando Rasters Local de Drogas para o Portal  ...")
 # Workspace sempre sera o DataStore do Portal
 arcpy.env.overwriteOutput = True
 arcpy.env.workspace = os.environ.get("WORKSPACE")
-#arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(3857)
 
+#arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(3857)
 #spatial_ref = arcpy.Describe(localDataStore).spatialReference
-#arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(os.environ.get("SP_REF"))
+arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(os.environ.get("SP_REF"))
 
 MyPortal = os.environ.get("PORTAL_URL")
 MyUserName = os.environ.get("PORTAL_USER")
@@ -42,7 +42,7 @@ except:
     print("Portal SSPAL indisponível !")
 
 outdir = os.environ.get("PROJECT_FOLDER")
-service_name = "RASTERS_AREAS_DROGAS"
+service_name = "RASTERS_DROGAS"
 
 # deletando arquivo de serviço dentro da pasta de projeto
 if arcpy.Exists(service_name):
@@ -67,7 +67,7 @@ for lyr in m.listLayers('RASTER*'):
 
 # Rasters
 lyrs = []
-lyrs.append(m.listLayers('RASTER_ARMA_2023')[0])
+lyrs.append(m.listLayers('RASTER_DROGA_2023')[0])
 
 print("Preparando à camada raster de Armas para publicação ...")
 
@@ -85,7 +85,7 @@ sddraft.overwriteExistingService = True
 sddraft.copyDataToServer = True
 
 sddraft.summary = "Camada de Raster de DROGAS - atualizada em: " + dhProcessamento
-sddraft.tags = "Rasters, Influencias, DROGA2023 "
+sddraft.tags = "Rasters, Influencias, DROGAS "
 sddraft.description = "Camada de Raster de DROGAS - " + dhProcessamento
 sddraft.credits = "CHEII/SSPAL - Todos os Direitos reservados"
 sddraft.useLimitations = "Ilimitado"
@@ -101,6 +101,31 @@ sddraft.exportToSDDraft(sddraft_output_filename)
 #"""Modify the .sddraft to enable caching"""
 # Read the file
 doc = DOM.parse(sddraft_output_filename)
+
+
+
+# Ajutes da StagingSettings
+stagSettings = doc.getElementsByTagName('StagingSettings')[0]
+propSetArray = stagSettings.firstChild
+propSetProperties = propSetArray.childNodes
+
+for propSetProperty in propSetProperties:
+    keyValues = propSetProperty.childNodes
+    for keyValue in keyValues:
+        if keyValue.tagName == 'Key':
+            if keyValue.firstChild.data == "HasCache":
+                keyValue.nextSibling.firstChild.data = "true"
+            if keyValue.firstChild.data == "useMapServiceLayerID":
+                keyValue.nextSibling.firstChild.data = "true"
+            if keyValue.firstChild.data == "IsHostedServer":
+                keyValue.nextSibling.firstChild.data = "true"
+            if keyValue.firstChild.data == "HasMosaic":
+                keyValue.nextSibling.firstChild.data = "true"
+            if keyValue.firstChild.data == "HasBDAW":
+                keyValue.nextSibling.firstChild.data = "true"
+            if keyValue.firstChild.data == "IncludeDataInSDFile":
+                keyValue.nextSibling.firstChild.data = "true"
+
 # Ajutes da ConfigurationProperties
 configProps = doc.getElementsByTagName('ConfigurationProperties')[0]
 propArray = configProps.firstChild
@@ -119,28 +144,10 @@ for propSet in propSets:
             if keyValue.firstChild.data == "maxScale":
                 keyValue.nextSibling.firstChild.data = "9027.9774109999998"
             if keyValue.firstChild.data == "clientCachingAllowed":
-                keyValue.nextSibling.firstChild.data = "false"
+                keyValue.nextSibling.firstChild.data = "true"
             if keyValue.firstChild.data == "isCached":
                 keyValue.nextSibling.firstChild.data = "true"
             if keyValue.firstChild.data == "ignoreCache":
-                keyValue.nextSibling.firstChild.data = "true"
-
-# Ajutes da StagingSettings
-stagSettings = doc.getElementsByTagName('StagingSettings')[0]
-propSetArray = stagSettings.firstChild
-propSetProperties = propSetArray.childNodes
-
-for propSetProperty in propSetProperties:
-    keyValues = propSetProperty.childNodes
-    for keyValue in keyValues:
-        if keyValue.tagName == 'Key':
-            if keyValue.firstChild.data == "useMapServiceLayerID":
-                keyValue.nextSibling.firstChild.data = "true"
-            if keyValue.firstChild.data == "IsHostedServer":
-                keyValue.nextSibling.firstChild.data = "true"
-            if keyValue.firstChild.data == "HasMosaic":
-                keyValue.nextSibling.firstChild.data = "true"
-            if keyValue.firstChild.data == "HasBDAW":
                 keyValue.nextSibling.firstChild.data = "true"
 
 # Write to a new .sddraft file
@@ -152,7 +159,8 @@ doc.writexml(f)
 f.close()
 
 print("Preparando serviço para publicação ...")
-arcpy.server.StageService(sddraft_output_filename, sd_output_filename)
+# enviando o _mod_xml.ssdraft com as configurações
+arcpy.server.StageService(sddraft_mod_xml_file, sd_output_filename)
 
 # Variaveis para definir o upload/compartilhamento do serviço
 inSdFile = sd_output_filename

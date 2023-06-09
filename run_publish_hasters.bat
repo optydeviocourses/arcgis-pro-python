@@ -1,7 +1,7 @@
 @echo off
 rem Inicio do procedimento.
 set STARTTIME=%TIME%
-echo Tentativa %Contador% Publicando Todos os Rasters
+echo Tentativa Publicando Todos os Rasters
 
 C:\Progra~1\ArcGIS\Pro\bin\Python\envs\arcgispro-py3\python.exe C:\Users\inteligencia\Documents\Projetos\Publish\Rasters\Run_Publish_Droga.py
 C:\Progra~1\ArcGIS\Pro\bin\Python\envs\arcgispro-py3\python.exe C:\Users\inteligencia\Documents\Projetos\Publish\Rasters\Run_Publish_Arma.py
