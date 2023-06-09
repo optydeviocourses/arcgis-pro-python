@@ -7,8 +7,8 @@ rem preparando o processamento dos rasters
 call run_publish_hasters.bat
 
 rem publicando as camadas de recursos e hotspots
-call run_publish_recursos.bat
-call run publish_hotspots.bat
+@REM call run_publish_recursos.bat
+@REM call run publish_hotspots.bat
 
 rem Fim do procedimento.
 set ENDTIME=%TIME%
