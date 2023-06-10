@@ -3,12 +3,12 @@ rem Inicio do procedimento.
 set STARTTIME=%TIME%
 echo Publicando Todos os Rasters
 
-rem preparando o processamento dos rasters
-call run_publish_hasters.bat
-
 rem publicando as camadas de recursos e hotspots
 call run_publish_recursos.bat
-call run publish_hotspots.bat
+call run_publish_hotspots.bat
+
+rem preparando o processamento dos rasters
+call run_publish_hasters.bat
 
 rem Fim do procedimento.
 set ENDTIME=%TIME%

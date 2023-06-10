@@ -46,11 +46,11 @@ except:
 
 # pegando dados da pasta do projeto
 outdir = os.environ.get("PROJECT_FOLDER")
-service_name = "RASTERS_CVLI"
+service_name = "RASTER_CVLI_2023"
 
 # deletando arquivo de serviço dentro da pasta de projeto
-if arcpy.Exists(service_name):
-    arcpy.Delete_management(service_name)
+# if arcpy.Exists(service_name):
+#     arcpy.Delete_management(service_name)
 
 # preparando o ssddraft do serviço
 sddraft_filename = service_name + ".sddraft"
@@ -90,7 +90,7 @@ myPortalServiceURL = (MyPortal + "/" + "rest/services" +"/" + service_name + "/"
 sddraft = m.getWebLayerSharingDraft(server_type, "TILE", service_name, lyrs)
 
 # Servidor federado
-sddraft.federatedServerUrl = federated_server_url
+#sddraft.federatedServerUrl = federated_server_url
 sddraft.overwriteExistingService = True
 sddraft.copyDataToServer = True
 
@@ -100,7 +100,6 @@ sddraft.tags = "Rasters, Influencias, CVLI"
 sddraft.description = "Camada de Raster de CVLI - " + dhProcessamento
 sddraft.credits = r"CHEII/SSPAL - Todos os Direitos reservados"
 sddraft.useLimitations = "Ilimitado"
-
 
 print("Criando serviços para publicação ...")
 # if arcpy.Exists(sd_output_filename):
@@ -113,16 +112,16 @@ sddraft.exportToSDDraft(sddraft_output_filename)
 # Read the file
 doc = DOM.parse(sddraft_output_filename)
 
-# Ajutes da local dos dados
-manSVCX = doc.getElementsByTagName('SVCManifest')[0]
-manSVCXValue =  manSVCX.firstChild
-manSVCXValues = manSVCXValue.childNodes
+# # Ajutes da local dos dados
+# manSVCX = doc.getElementsByTagName('SVCManifest')[0]
+# manSVCXValue =  manSVCX.firstChild
+# manSVCXValues = manSVCXValue.childNodes
 
-for man in manSVCXValues:
-    keyValues = man.childNodes
-    for keyValue in keyValues:
-        if keyValue.tagName == 'DataFolder':
-            keyValue.nextSibling.firstChild.data = os.environ.get("RASTER_GDB_CVLI")
+# for man in manSVCXValues:
+#     keyValues = man.childNodes
+#     for keyValue in keyValues:
+#         if keyValue.tagName == 'DataFolder':
+#             keyValue.nextSibling.firstChild.data = os.environ.get("RASTER_GDB_CVLI")
 
 # Ajutes da StagingSettings
 stagSettings = doc.getElementsByTagName('StagingSettings')[0]
@@ -140,13 +139,13 @@ for propSetProperty in propSetProperties:
             if keyValue.firstChild.data == "IsHostedServer":
                 keyValue.nextSibling.firstChild.data = "true"
             if keyValue.firstChild.data == "HasMosaic":
-                keyValue.nextSibling.firstChild.data = "true"
-            if keyValue.firstChild.data == "HasBDAW":
                 keyValue.nextSibling.firstChild.data = "false"
-            if keyValue.firstChild.data == "IncludeDataInSDFile":
+            if keyValue.firstChild.data == "HasBDAW":
                 keyValue.nextSibling.firstChild.data = "true"
+            if keyValue.firstChild.data == "IncludeDataInSDFile":
+                keyValue.nextSibling.firstChild.data = "false"
 
-# Ajutes da ConfigurationProperties
+#Ajutes da ConfigurationProperties
 configProps = doc.getElementsByTagName('ConfigurationProperties')[0]
 propArray = configProps.firstChild
 propSets = propArray.childNodes
@@ -155,6 +154,8 @@ for propSet in propSets:
     keyValues = propSet.childNodes
     for keyValue in keyValues:
         if keyValue.tagName == 'Key':
+            if keyValue.firstChild.data == "exportTilesAllowed":
+                keyValue.nextSibling.firstChild.data = "true"
             if keyValue.firstChild.data == "maxRecordCount":
                 keyValue.nextSibling.firstChild.data = "20000"
             if keyValue.firstChild.data == "cacheOnDemand":
@@ -168,9 +169,9 @@ for propSet in propSets:
             if keyValue.firstChild.data == "isCached":
                 keyValue.nextSibling.firstChild.data = "true"
             if keyValue.firstChild.data == "ignoreCache":
-                keyValue.nextSibling.firstChild.data = "true"
+                keyValue.nextSibling.firstChild.data = "false"
 
-# Write to a new .sddraft file
+#Write to a new .sddraft file
 sddraft_mod_xml = service_name + '_mod_xml' + '.sddraft'
 sddraft_mod_xml_file = os.path.join(outdir, sddraft_mod_xml)
 

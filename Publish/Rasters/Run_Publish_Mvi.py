@@ -84,7 +84,7 @@ server_url =  os.environ.get("SERVER_URL")
 federated_server_url = os.environ.get("SERVICE_URL")
 
 # prepatando a camada Tile
-sddraft = m.getWebLayerSharingDraft(server_type, "TILE", service_name, lyrs)
+sddraft = m.getWebLayerSharingDraft(server_type, "TILE", service_name, lyrss)
 
 # Servidor federado
 sddraft.federatedServerUrl = federated_server_url
@@ -109,6 +109,16 @@ sddraft.exportToSDDraft(sddraft_output_filename)
 # Read the file
 doc = DOM.parse(sddraft_output_filename)
 
+# Ajutes da local dos dados
+manSVCX = doc.getElementsByTagName('SVCManifest')[0]
+manSVCXValue =  manSVCX.firstChild
+manSVCXValues = manSVCXValue.childNodes
+
+for man in manSVCXValues:
+    keyValues = man.childNodes
+    for keyValue in keyValues:
+        if keyValue.tagName == 'DataFolder':
+            keyValue.nextSibling.firstChild.data = os.environ.get("RASTER_GDB_CVLI")
 
 # Ajutes da StagingSettings
 stagSettings = doc.getElementsByTagName('StagingSettings')[0]
