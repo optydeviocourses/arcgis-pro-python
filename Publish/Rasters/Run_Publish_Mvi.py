@@ -20,9 +20,6 @@ print("Criando Rasters Local de CVLIs para o Portal  ...")
 arcpy.env.overwriteOutput = True
 arcpy.env.workspace = os.environ.get("WORKSPACE")
 
-#arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(3857)
-#arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(4326)
-#arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(os.environ.get("RES_ARCGIS_PRO_TS_WGS84_GEO_LOCAL"))
 arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(os.environ.get("SP_REF"))
 
 MyPortal = os.environ.get("PORTAL_URL")

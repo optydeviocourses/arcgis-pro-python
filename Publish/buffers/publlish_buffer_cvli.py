@@ -35,10 +35,10 @@ except:
 
 
 outdir = os.environ.get("PROJECT_FOLDER")
-service_name = "HOTSPOTS_CVP"
+service_name = "AREA_INF_CVLI"
 
 if arcpy.Exists(service_name):
-    arcpy.Delete_management(service_name)
+    arcpy.management.Delete(service_name)
 
 sddraft_filename = service_name + ".sddraft"
 sddraft_output_filename = os.path.join(outdir, sddraft_filename)
@@ -52,16 +52,16 @@ aprx = arcpy.mp.ArcGISProject(MyProject)
 # Mapa de referência
 m = aprx.listMaps(MyMapName)[0]
 
-for lyr in m.listLayers('HOTSPOTS_ANALISE*'):
-    if lyr.name == "HOTSPOTS_ANALISE_CVP_2023":
+for lyr in m.listLayers('AREA*'):
+    if lyr.name == service_name:
         lyr.visible = True
         lyr.transparency = 50
 
 # Rasters
 lyrs = []
-lyrs.append(m.listLayers('HOTSPOTS_ANALISE_CVP_2023')[0])
+lyrs.append(m.listLayers(service_name)[0])
 
-print("Preparando à camada HotSpot para publicação ...")
+print("Preparando à camada Área CVLI para publicação ...")
 
 server_type = "HOSTING_SERVER"
 
@@ -69,9 +69,9 @@ sddraft = m.getWebLayerSharingDraft(server_type, "FEATURE", service_name, lyrs)
 
 sddraft.overwriteExistingService = True
 sddraft.copyDataToServer = True
-sddraft.summary = "Camada de Hotspots de CVP - atualizada em: " + dhProcessamento
-sddraft.tags = "Hotspots, Influencias, CVP2023"
-sddraft.description = "Camada de Hotspots de CVP - " + dhProcessamento
+sddraft.summary = "Camada de Área CVLI - atualizada em: " + dhProcessamento
+sddraft.tags = "Hotspots, Influencias, CVLI2023"
+sddraft.description = "Camada de Área CVLI - " + dhProcessamento
 sddraft.credits = "CHEII/SSPAL - Todos os Direitos reservados"
 sddraft.useLimitations = "Ilimitado"
 
@@ -82,7 +82,7 @@ sddraft.exportToSDDraft(sddraft_output_filename)
 print("Preparando serviços para publicação ...")
 
 if arcpy.Exists(sd_output_filename):
-    arcpy.Delete_management(sd_output_filename)
+    arcpy.management.Delete(sd_output_filename)
 
 # Stage Service para à publicação
 arcpy.server.StageService(sddraft_output_filename, sd_output_filename)
@@ -90,7 +90,7 @@ arcpy.server.StageService(sddraft_output_filename, sd_output_filename)
 inSdFile = sd_output_filename
 inServer = "HOSTING_SERVER"
 inServiceName = service_name
-inCluster = "#"
+inCluster = "GEOSSP.sde"
 inFolderType = "EXISTING"
 inFolder = "Secretario"
 inStartup = "STARTED"
@@ -105,15 +105,12 @@ print("Subindo às definições do serviço ...")
 if arcpy.Exists(inServiceName):
     arcpy.Delete_management(inServiceName)
 
-if arcpy.Exists("0123456789ABCDEF"):
-    arcpy.Delete_management("0123456789ABCDEF")
-
 try:
     arcpy.server.UploadServiceDefinition(inSdFile, inServer, inServiceName,
                                         inCluster, inFolderType, inFolder,
                                         inStartup, inOverride, inMyContents,
                                         inPublic, inOrganization, inGroups)
-    print("Publicação do Hotspots de CVP realizada com sucesso !!!")
+    print("Publicação do Área CVLI realizada com sucesso !!!")
 except:
     print(arcpy.GetMessages())
-    print("Erros na publicação do Hotspots de CVPs ! Tente novamente ...")
+    print("Erros na publicação do Área CVLI ! Tente novamente ...")

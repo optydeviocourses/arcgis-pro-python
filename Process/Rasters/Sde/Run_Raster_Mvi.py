@@ -18,11 +18,7 @@ print("Iniciando Processo de rasteamento de CVLIs ...")
 
 arcpy.env.workspace = os.environ.get("WORKSPACE")
 
-#spatial_ref = arcpy.Describe(localDataStore).spatialReference
 arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(os.environ.get("SP_REF"))
-
-# Set Cell Size Projection Method environment
-#arcpy.env.cellSizeProjectionMethod = "PRESERVE_RESOLUTION"
 
 sdeDir = os.environ.get("PROJECT_FOLDER")
 localDir = os.environ.get("PATH_ASSII")
